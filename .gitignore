@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+backend/venv/
+backend/__pycache__/
+backend/.pytest_cache/
+*.db
+backend/alembic/__pycache__/
+backend/app/__pycache__/
+backend/app/routers/__pycache__/
