@@ -9,19 +9,19 @@ router = APIRouter(
 )
 
 @router.post("/start")
-def start():
+async def start():
     return start_simulator()
 
 @router.post("/stop")
-def stop():
+async def stop():
     return stop_simulator()
 
 @router.post("/scenario/{scenario_name}")
-def update_scenario(scenario_name: str):
+async def update_scenario(scenario_name: str):
     return set_scenario(scenario_name)
 
 @router.post("/set-shipment/{shipment_id}")
-def setup_simulation_shipment(shipment_id: int, db: Session = Depends(database.get_db)):
+async def setup_simulation_shipment(shipment_id: int, db: Session = Depends(database.get_db)):
     shipment = db.query(models.Shipment).filter(models.Shipment.id == shipment_id).first()
     if not shipment or not shipment.device_id:
         raise HTTPException(status_code=400, detail="Invalid shipment or no device assigned")

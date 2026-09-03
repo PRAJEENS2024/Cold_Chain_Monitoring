@@ -56,9 +56,14 @@ async def simulator_loop():
                     
                     # Update Device Last Seen
                     device = db.query(models.Device).filter(models.Device.id == simulator_state.active_device_id).first()
+                    shipment = db.query(models.Shipment).filter(models.Shipment.id == simulator_state.active_shipment_id).first()
                     if device:
                         device.status = models.DeviceStatusEnum.ONLINE
                         device.last_seen = datetime.now(timezone.utc)
+                    
+                    if device and shipment:
+                        from .alert_engine import process_telemetry
+                        process_telemetry(db, device, shipment, simulator_state.current_temp, simulator_state.door_open)
                     
                     db.commit()
 

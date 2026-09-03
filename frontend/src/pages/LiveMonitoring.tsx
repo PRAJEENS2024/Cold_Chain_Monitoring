@@ -18,12 +18,18 @@ export default function LiveMonitoring() {
     }
   };
 
+  const selectedShipmentRef = React.useRef(selectedShipment);
+  useEffect(() => {
+    selectedShipmentRef.current = selectedShipment;
+  }, [selectedShipment]);
+
   const fetchSimStatus = async () => {
     try {
       const res = await api.get('/simulator/status');
       setSimStatus(res.data);
       // Append reading to chart if simulator is running for this shipment
-      if (res.data.is_running && selectedShipment && res.data.active_shipment_id === selectedShipment.id) {
+      const currentShipment = selectedShipmentRef.current;
+      if (res.data.is_running && currentShipment && res.data.active_shipment_id === currentShipment.id) {
         setReadings(prev => {
           const newReadings = [...prev, { time: new Date().toLocaleTimeString(), temp: res.data.current_temp }];
           if (newReadings.length > 20) newReadings.shift(); // keep last 20
@@ -34,9 +40,10 @@ export default function LiveMonitoring() {
   };
 
   const fetchPrediction = async () => {
-    if (!selectedShipment) return;
+    const currentShipment = selectedShipmentRef.current;
+    if (!currentShipment) return;
     try {
-      const res = await api.get(`/analytics/shipment/${selectedShipment.id}/prediction`);
+      const res = await api.get(`/analytics/shipment/${currentShipment.id}/prediction`);
       if (res.data.status === 'success') {
         setPrediction(res.data);
       } else {
@@ -56,7 +63,7 @@ export default function LiveMonitoring() {
       fetchPrediction();
     }, 5000);
     return () => clearInterval(interval);
-  }, [selectedShipment]);
+  }, []);
 
   const handleSimAction = async (action: string, payload?: any) => {
     try {
@@ -118,8 +125,8 @@ export default function LiveMonitoring() {
                   <div className="text-blue-500 flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> Min: {selectedShipment.temp_min}°C</div>
                 </div>
               </div>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
+              <div style={{ width: '100%', height: 320 }}>
+                <ResponsiveContainer width="100%" height={320}>
                   <LineChart data={readings}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                     <XAxis dataKey="time" stroke="#64748b" fontSize={12} tickMargin={10} />
@@ -127,7 +134,7 @@ export default function LiveMonitoring() {
                     <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                     <ReferenceLine y={selectedShipment.temp_max} stroke="#ef4444" strokeDasharray="4 4" />
                     <ReferenceLine y={selectedShipment.temp_min} stroke="#3b82f6" strokeDasharray="4 4" />
-                    <Line type="monotone" dataKey="temp" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6 }} animationDuration={300} />
+                    <Line type="monotone" dataKey="temp" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6 }} animationDuration={300} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

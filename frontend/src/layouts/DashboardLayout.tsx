@@ -6,7 +6,7 @@ import {
   Package, 
   Activity, 
   Cpu, 
-  BellAlert, 
+  BellRing, 
   LineChart, 
   FileText,
   LogOut,
@@ -28,7 +28,7 @@ export default function DashboardLayout() {
     { name: 'Shipments', path: '/shipments', icon: Package },
     { name: 'Live Monitoring', path: '/monitoring', icon: Activity },
     { name: 'Devices', path: '/devices', icon: Cpu },
-    { name: 'Alerts', path: '/alerts', icon: BellAlert },
+    { name: 'Alerts', path: '/alerts', icon: BellRing },
     { name: 'Analytics', path: '/analytics', icon: LineChart },
     { name: 'Reports', path: '/reports', icon: FileText },
   ];
