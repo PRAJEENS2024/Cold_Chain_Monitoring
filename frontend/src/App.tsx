@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Shipments from './pages/Shipments';
@@ -24,9 +26,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         
-        <Route path="/" element={
+        <Route path="/app" element={
           <ProtectedRoute>
             <DashboardLayout />
           </ProtectedRoute>

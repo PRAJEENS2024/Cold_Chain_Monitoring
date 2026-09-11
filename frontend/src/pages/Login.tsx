@@ -23,7 +23,7 @@ export default function Login() {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
       login(res.data.access_token);
-      navigate('/');
+      navigate('/app');
     } catch (err) {
       setError('Invalid username or password');
     }

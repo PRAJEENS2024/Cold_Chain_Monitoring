@@ -29,13 +29,13 @@ export default function DashboardLayout() {
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Shipments', path: '/shipments', icon: Package },
-    { name: 'Live Monitoring', path: '/monitoring', icon: Activity },
-    { name: 'Devices', path: '/devices', icon: Cpu },
-    { name: 'Alerts', path: '/alerts', icon: BellRing },
-    { name: 'Analytics', path: '/analytics', icon: LineChart },
-    { name: 'Reports', path: '/reports', icon: FileText },
+    { name: 'Dashboard', path: '/app', icon: LayoutDashboard },
+    { name: 'Shipments', path: '/app/shipments', icon: Package },
+    { name: 'Live Monitoring', path: '/app/monitoring', icon: Activity },
+    { name: 'Devices', path: '/app/devices', icon: Cpu },
+    { name: 'Alerts', path: '/app/alerts', icon: BellRing },
+    { name: 'Analytics', path: '/app/analytics', icon: LineChart },
+    { name: 'Reports', path: '/app/reports', icon: FileText },
   ];
 
   return (
@@ -59,7 +59,7 @@ export default function DashboardLayout() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path || 
-                             (item.path !== '/' && location.pathname.startsWith(item.path));
+                             (item.path !== '/app' && location.pathname.startsWith(item.path));
             
             return (
               <Link
@@ -100,7 +100,7 @@ export default function DashboardLayout() {
               <Menu className="w-6 h-6" />
             </button>
             <div className="font-medium text-lg tracking-wide hidden sm:block">
-              {navItems.find(i => location.pathname === i.path || (i.path !== '/' && location.pathname.startsWith(i.path)))?.name || 'Dashboard'}
+              {navItems.find(i => location.pathname === i.path || (i.path !== '/app' && location.pathname.startsWith(i.path)))?.name || 'Dashboard'}
             </div>
           </div>
           
