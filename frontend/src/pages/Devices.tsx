@@ -1,34 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import { Cpu, Plus, Search, X } from 'lucide-react';
+import { Cpu, Search, Plus, Wifi, Server, X, Activity } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Devices() {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    device_id: '',
-    name: '',
-    esp32_identifier: '',
-    firmware_version: '1.0.0',
-    thingspeak_channel_id: '',
-    thingspeak_read_key: ''
-  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [selectedDevice, setSelectedDevice] = useState<any>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleAddDevice = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+    const form = e.target as HTMLFormElement;
+    const data = {
+      device_id: (form.elements.namedItem('device_id') as HTMLInputElement).value,
+      name: (form.elements.namedItem('name') as HTMLInputElement).value,
+      esp32_identifier: (form.elements.namedItem('esp32_identifier') as HTMLInputElement).value,
+      firmware_version: (form.elements.namedItem('firmware_version') as HTMLInputElement).value,
+      thingspeak_channel_id: (form.elements.namedItem('thingspeak_channel_id') as HTMLInputElement).value || null,
+      thingspeak_read_key: (form.elements.namedItem('thingspeak_read_key') as HTMLInputElement).value || null,
+    };
     try {
-      await api.post('/devices/', formData);
-      setShowModal(false);
-      setFormData({ device_id: '', name: '', esp32_identifier: '', firmware_version: '1.0.0', thingspeak_channel_id: '', thingspeak_read_key: '' });
+      await api.post('/devices/', data);
+      setIsModalOpen(false);
       fetchDevices();
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Error registering device');
+      setError(err.response?.data?.detail || 'Error registering device');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,7 +119,7 @@ export default function Devices() {
                     </span>
                   </td>
                   <td className="p-5 text-right">
-                    <button onClick={() => alert(`Configuration panel opening for ${d.device_id}`)} className="text-primary hover:text-primaryHover font-semibold text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-sm transition-colors opacity-0 group-hover:opacity-100">
+                    <button onClick={() => setSelectedDevice(d)} className="text-primary hover:text-primaryHover font-semibold text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-sm transition-colors opacity-0 group-hover:opacity-100">
                       Configure
                     </button>
                   </td>
@@ -187,6 +191,74 @@ export default function Devices() {
           </div>
         </div>
       )}
+
+      {/* Device Configuration Modal */}
+      <AnimatePresence>
+        {selectedDevice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60" onClick={() => setSelectedDevice(null)}
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-sm shadow-2xl w-full max-w-lg relative z-10 overflow-hidden"
+            >
+              <div className="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Device Configuration</h2>
+                  <p className="text-sm text-slate-500 font-medium mt-1">{selectedDevice.name}</p>
+                </div>
+                <button onClick={() => setSelectedDevice(null)} className="text-slate-400 hover:text-slate-600 bg-white hover:bg-slate-100 p-2 rounded-sm border border-slate-200 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-6">
+                <div className="bg-blue-50/50 p-4 border border-blue-100 rounded-sm flex items-start gap-4">
+                  <Activity className="w-6 h-6 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-bold text-slate-800 text-sm">Telemetry Ping Frequency</h3>
+                    <p className="text-xs text-slate-600 mt-1 mb-3">Adjust how often this sensor pushes data to the backend.</p>
+                    <select className="w-full p-2 border border-slate-300 rounded-sm text-sm focus:ring-1 focus:ring-primary focus:border-primary">
+                      <option>10 seconds (High Drain)</option>
+                      <option>30 seconds (Standard)</option>
+                      <option>1 minute (Battery Saver)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-4 border border-slate-200 rounded-sm">
+                  <h3 className="font-bold text-slate-800 text-sm mb-3">Hardware Info</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between border-b border-slate-200 pb-2">
+                      <span className="text-slate-500 font-medium">Device ID</span>
+                      <span className="font-bold text-slate-800">{selectedDevice.device_id}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-slate-200 pb-2">
+                      <span className="text-slate-500 font-medium">MAC / Ident</span>
+                      <span className="font-mono text-slate-800">{selectedDevice.esp32_identifier}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 font-medium">Firmware</span>
+                      <span className="font-bold text-slate-800">v{selectedDevice.firmware_version}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+                <button onClick={() => setSelectedDevice(null)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 border border-slate-300 rounded-sm font-semibold transition-colors">
+                  Cancel
+                </button>
+                <button onClick={() => { alert('Configuration saved (dummy)'); setSelectedDevice(null); }} className="bg-primary hover:bg-primaryHover text-white px-4 py-2 rounded-sm font-semibold shadow-sm transition-all">
+                  Save Changes
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
