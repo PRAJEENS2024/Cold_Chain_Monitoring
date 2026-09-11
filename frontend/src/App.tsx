@@ -10,7 +10,7 @@ import Alerts from './pages/Alerts';
 import Reports from './pages/Reports';
 
 // Placeholder Pages
-const Devices = () => <div>Devices</div>;
+import Devices from './pages/Devices';
 const Analytics = () => <div>Analytics</div>;
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

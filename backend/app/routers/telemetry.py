@@ -74,3 +74,33 @@ def acknowledge_alert(alert_id: int, db: Session = Depends(database.get_db)):
     # in real world, set acknowledged_by from current user token
     db.commit()
     return {"status": "Acknowledged"}
+
+@router.get("/shipment/{shipment_id}/telemetry")
+def get_shipment_telemetry(shipment_id: int, db: Session = Depends(database.get_db)):
+    shipment = db.query(models.Shipment).filter(models.Shipment.id == shipment_id).first()
+    if not shipment:
+        raise HTTPException(status_code=404, detail="Shipment not found")
+
+    # Get last 20 temperature readings
+    temps = db.query(models.TemperatureReading).filter(
+        models.TemperatureReading.shipment_id == shipment_id
+    ).order_by(models.TemperatureReading.timestamp.desc()).limit(20).all()
+    
+    # Get latest door event
+    door_event = db.query(models.DoorEvent).filter(
+        models.DoorEvent.shipment_id == shipment_id
+    ).order_by(models.DoorEvent.timestamp.desc()).first()
+    
+    # Reverse temperatures to chronological order for graphs
+    temps.reverse()
+    readings = [{"time": t.timestamp.strftime('%H:%M:%S'), "temp": t.temperature} for t in temps]
+    
+    current_temp = temps[-1].temperature if temps else None
+    door_open = (door_event.state == models.DoorStateEnum.OPEN) if door_event else False
+    
+    return {
+        "current_temp": current_temp,
+        "door_open": door_open,
+        "readings": readings,
+        "device_status": shipment.device.status if shipment.device else None
+    }

@@ -77,6 +77,8 @@ class Device(Base):
     status = Column(Enum(DeviceStatusEnum), default=DeviceStatusEnum.OFFLINE)
     last_seen = Column(DateTime(timezone=True), nullable=True)
     firmware_version = Column(String, nullable=True)
+    thingspeak_channel_id = Column(String, nullable=True)
+    thingspeak_read_key = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     shipments = relationship("Shipment", back_populates="device")

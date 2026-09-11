@@ -10,6 +10,8 @@ export default function LiveMonitoring() {
   const [prediction, setPrediction] = useState<any>(null);
   const [readings, setReadings] = useState<any[]>([]); // For chart
 
+  const [telemetry, setTelemetry] = useState<any>(null); // For real DB state
+
   const fetchShipments = async () => {
     const res = await api.get('/shipments');
     setShipments(res.data);
@@ -23,19 +25,22 @@ export default function LiveMonitoring() {
     selectedShipmentRef.current = selectedShipment;
   }, [selectedShipment]);
 
+  const fetchTelemetry = async () => {
+    const currentShipment = selectedShipmentRef.current;
+    if (!currentShipment) return;
+    try {
+      const res = await api.get(`/api/iot/shipment/${currentShipment.id}/telemetry`);
+      setTelemetry(res.data);
+      if (res.data.readings) {
+        setReadings(res.data.readings);
+      }
+    } catch (e) {}
+  };
+
   const fetchSimStatus = async () => {
     try {
       const res = await api.get('/simulator/status');
       setSimStatus(res.data);
-      // Append reading to chart if simulator is running for this shipment
-      const currentShipment = selectedShipmentRef.current;
-      if (res.data.is_running && currentShipment && res.data.active_shipment_id === currentShipment.id) {
-        setReadings(prev => {
-          const newReadings = [...prev, { time: new Date().toLocaleTimeString(), temp: res.data.current_temp }];
-          if (newReadings.length > 20) newReadings.shift(); // keep last 20
-          return newReadings;
-        });
-      }
     } catch (e) {}
   };
 
@@ -58,8 +63,10 @@ export default function LiveMonitoring() {
 
   useEffect(() => {
     fetchSimStatus();
+    fetchTelemetry();
     const interval = setInterval(() => {
       fetchSimStatus();
+      fetchTelemetry();
       fetchPrediction();
     }, 5000);
     return () => clearInterval(interval);
@@ -185,16 +192,16 @@ export default function LiveMonitoring() {
                   </div>
                   <div>
                     <div className="text-slate-500 text-sm">Temperature</div>
-                    <div className="text-2xl font-bold text-slate-800">{simStatus?.current_temp || '--'}°C</div>
+                    <div className="text-2xl font-bold text-slate-800">{telemetry?.current_temp ?? simStatus?.current_temp ?? '--'}°C</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-lg ${simStatus?.door_open ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
-                    {simStatus?.door_open ? <DoorOpen className="w-6 h-6" /> : <DoorClosed className="w-6 h-6" />}
+                  <div className={`p-3 rounded-lg ${(telemetry?.door_open ?? simStatus?.door_open) ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+                    {(telemetry?.door_open ?? simStatus?.door_open) ? <DoorOpen className="w-6 h-6" /> : <DoorClosed className="w-6 h-6" />}
                   </div>
                   <div>
                     <div className="text-slate-500 text-sm">Door Status</div>
-                    <div className="text-2xl font-bold text-slate-800">{simStatus?.door_open ? 'OPEN' : 'CLOSED'}</div>
+                    <div className="text-2xl font-bold text-slate-800">{(telemetry?.door_open ?? simStatus?.door_open) ? 'OPEN' : 'CLOSED'}</div>
                   </div>
                 </div>
               </div>

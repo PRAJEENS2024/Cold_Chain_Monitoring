@@ -30,6 +30,8 @@ class DeviceBase(BaseModel):
     name: Optional[str] = None
     esp32_identifier: Optional[str] = None
     firmware_version: Optional[str] = None
+    thingspeak_channel_id: Optional[str] = None
+    thingspeak_read_key: Optional[str] = None
 
 class DeviceCreate(DeviceBase):
     pass
