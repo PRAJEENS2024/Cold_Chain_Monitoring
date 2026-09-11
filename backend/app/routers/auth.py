@@ -24,7 +24,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         data={"sub": user.username, "role": user.role}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-    return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/signup", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
 def signup(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
