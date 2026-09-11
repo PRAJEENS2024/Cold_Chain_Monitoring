@@ -122,7 +122,7 @@ export default function LiveMonitoring() {
           
           {/* Main Chart Area */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6">
+            <div className="bg-white rounded-sm border border-slate-200 shadow-flat p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                   <Activity className="text-primary w-5 h-5" /> Temperature History
@@ -157,28 +157,27 @@ export default function LiveMonitoring() {
             </div>
 
             {/* Predictive Analytics */}
-            <div className="bg-slate-900 rounded-2xl shadow-xl p-6 relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="bg-slate-800 rounded-sm shadow-flat p-6 relative overflow-hidden">
                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2 relative z-10">
-                 <AlertTriangle className="text-amber-400 w-5 h-5" /> AI Predictive Analytics
+                 <AlertTriangle className="text-accent w-5 h-5" /> AI Predictive Analytics
                </h2>
                {prediction ? (
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
-                   <div className="bg-slate-800/50 backdrop-blur-md p-5 rounded-xl border border-slate-700">
-                     <div className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Predicted Temp (Next {prediction.prediction_horizon})</div>
-                     <div className={`text-3xl font-extrabold tracking-tight ${prediction.risk === 'HIGH' ? 'text-red-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.5)]' : 'text-white'}`}>
+                   <div className="bg-slate-700/50 p-5 rounded-sm border border-slate-600">
+                     <div className="text-slate-300 text-xs uppercase tracking-wider font-semibold mb-2">Predicted Temp (Next {prediction.prediction_horizon})</div>
+                     <div className={`text-3xl font-extrabold tracking-tight ${prediction.risk === 'HIGH' ? 'text-red-400' : 'text-white'}`}>
                        {prediction.predicted_temp}°C
                      </div>
                    </div>
-                   <div className="bg-slate-800/50 backdrop-blur-md p-5 rounded-xl border border-slate-700">
-                     <div className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Current Trend</div>
+                   <div className="bg-slate-700/50 p-5 rounded-sm border border-slate-600">
+                     <div className="text-slate-300 text-xs uppercase tracking-wider font-semibold mb-2">Current Trend</div>
                      <div className="text-3xl font-extrabold tracking-tight text-white">
                        {prediction.trend}
                      </div>
                    </div>
-                   <div className="bg-slate-800/50 backdrop-blur-md p-5 rounded-xl border border-slate-700">
-                     <div className="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Risk Level</div>
-                     <div className={`text-3xl font-extrabold tracking-tight ${prediction.risk === 'HIGH' ? 'text-red-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.5)]' : (prediction.risk === 'MEDIUM' ? 'text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]')}`}>
+                   <div className="bg-slate-700/50 p-5 rounded-sm border border-slate-600">
+                     <div className="text-slate-300 text-xs uppercase tracking-wider font-semibold mb-2">Risk Level</div>
+                     <div className={`text-3xl font-extrabold tracking-tight ${prediction.risk === 'HIGH' ? 'text-red-400' : (prediction.risk === 'MEDIUM' ? 'text-warning' : 'text-success')}`}>
                        {prediction.risk}
                      </div>
                    </div>
@@ -193,7 +192,7 @@ export default function LiveMonitoring() {
           <div className="space-y-6">
             
             {/* Current Status */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6">
+            <div className="bg-white rounded-sm border border-slate-200 shadow-flat p-6">
               <h2 className="text-lg font-bold text-slate-800 mb-6">Current Readings</h2>
               <div className="space-y-6">
                 <div className="flex items-center gap-5">

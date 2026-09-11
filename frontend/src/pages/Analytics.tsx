@@ -56,7 +56,7 @@ export default function Analytics() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Fleet Health Score */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="bg-white rounded-sm border border-slate-200 shadow-flat p-6 flex flex-col items-center justify-center relative overflow-hidden">
           <div className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-help" title="Based on total excursions and active alerts vs safe shipments.">
             <HelpCircle className="w-5 h-5" />
           </div>
@@ -78,7 +78,7 @@ export default function Analytics() {
         </div>
 
         {/* AI Prediction Accuracy */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6">
+        <div className="bg-white rounded-sm border border-slate-200 shadow-flat p-6">
           <h2 className="text-lg font-bold text-slate-800 mb-2">AI Model Accuracy</h2>
           <p className="text-sm text-slate-500 font-medium mb-6">Confidence scoring for temperature forecasting.</p>
           <div className="h-48 w-full">
@@ -113,26 +113,25 @@ export default function Analytics() {
         </div>
 
         {/* Global Stats */}
-        <div className="bg-slate-900 rounded-2xl shadow-xl p-6 relative overflow-hidden flex flex-col justify-between">
-           <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="bg-slate-800 rounded-sm shadow-flat p-6 relative overflow-hidden flex flex-col justify-between">
            <div>
              <h2 className="text-lg font-bold text-white mb-2 relative z-10 flex items-center gap-2">
-               <ShieldCheck className="text-emerald-400 w-5 h-5" /> Active Defenses
+               <ShieldCheck className="text-success w-5 h-5" /> Active Defenses
              </h2>
-             <p className="text-slate-400 text-sm font-medium relative z-10">Real-time alerts and interventions.</p>
+             <p className="text-slate-300 text-sm font-medium relative z-10">Real-time alerts and interventions.</p>
            </div>
            
            <div className="space-y-4 relative z-10 mt-6">
-             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-               <span className="text-slate-400 font-semibold">Total Alerts Prevented</span>
+             <div className="flex justify-between items-center border-b border-slate-700 pb-3">
+               <span className="text-slate-300 font-semibold">Total Alerts Prevented</span>
                <span className="text-2xl font-black text-white">1,204</span>
              </div>
-             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-               <span className="text-slate-400 font-semibold">Average Temp Variance</span>
+             <div className="flex justify-between items-center border-b border-slate-700 pb-3">
+               <span className="text-slate-300 font-semibold">Average Temp Variance</span>
                <span className="text-2xl font-black text-white">±0.4°C</span>
              </div>
              <div className="flex justify-between items-center pb-1">
-               <span className="text-slate-400 font-semibold">Offline Interventions</span>
+               <span className="text-slate-300 font-semibold">Offline Interventions</span>
                <span className="text-2xl font-black text-white">18</span>
              </div>
            </div>
@@ -140,7 +139,7 @@ export default function Analytics() {
       </div>
 
       {/* Historical Excursion Chart */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6">
+      <div className="bg-white rounded-sm border border-slate-200 shadow-flat p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-lg font-bold text-slate-800">Historical Temperature Excursions</h2>

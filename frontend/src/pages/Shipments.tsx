@@ -23,24 +23,24 @@ export default function Shipments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+      <div className="flex justify-between items-center bg-white p-6 rounded-sm shadow-flat border border-slate-200">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Shipments</h1>
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Shipments</h1>
           <p className="text-slate-500 font-medium mt-1">Manage and track your cold-chain shipments globally.</p>
         </div>
-        <button className="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] font-semibold">
+        <button onClick={() => alert("New Shipment Wizard opening...")} className="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-sm flex items-center gap-2 transition-all shadow-sm font-semibold">
           <Plus className="w-5 h-5" /> New Shipment
         </button>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-2xl shadow-premium overflow-hidden">
-        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
+      <div className="bg-white border border-slate-200 rounded-sm shadow-flat overflow-hidden">
+        <div className="p-5 border-b border-slate-200 flex justify-between items-center bg-white">
           <div className="relative w-72">
             <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
               placeholder="Search shipments..." 
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all bg-slate-50 focus:bg-white"
+              className="w-full pl-10 pr-4 py-2.5 rounded-sm border border-slate-300 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm font-medium transition-all bg-slate-50 focus:bg-white"
             />
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function Shipments() {
                   </td>
                   <td className="p-5 font-medium text-slate-600">{s.destination}</td>
                   <td className="p-5 text-right">
-                    <button className="text-primary hover:text-primaryHover font-semibold text-sm bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                    <button onClick={() => alert(`Opening tracking details for ${s.shipment_id}`)} className="text-primary hover:text-primaryHover font-semibold text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-sm transition-colors opacity-0 group-hover:opacity-100">
                       View Details
                     </button>
                   </td>

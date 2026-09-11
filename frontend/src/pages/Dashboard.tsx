@@ -47,23 +47,22 @@ export default function Dashboard() {
   const StatCard = ({ title, value, icon: Icon, colorClass, bgColorClass, trend = 'stable' }: any) => {
     const data = React.useMemo(() => generateSparklineData(trend), [trend]);
     return (
-      <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-premium flex flex-col gap-4 hover:-translate-y-1 transition-all duration-300 group cursor-default relative overflow-hidden">
-        <div className="absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br from-slate-50 to-transparent rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700"></div>
+      <div className="bg-white rounded-sm p-5 border border-slate-200 shadow-flat flex flex-col gap-3 hover:-translate-y-0.5 hover:shadow-elevated transition-all duration-200 group cursor-default relative overflow-hidden">
         <div className="flex items-start justify-between relative z-10">
-          <div className={`p-3.5 rounded-xl ${bgColorClass} shadow-inner`}>
-            <Icon className={`w-6 h-6 ${colorClass}`} />
+          <div className={`p-3 rounded-md ${bgColorClass}`}>
+            <Icon className={`w-5 h-5 ${colorClass}`} />
           </div>
-          <div className="w-20 h-10">
+          <div className="w-20 h-8">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
-                <Line type="monotone" dataKey="value" stroke="currentColor" strokeWidth={2.5} dot={false} className={colorClass} isAnimationActive={false} />
+                <Line type="monotone" dataKey="value" stroke="currentColor" strokeWidth={2} dot={false} className={colorClass} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
-        <div className="relative z-10">
-          <div className="text-3xl font-extrabold text-slate-800 tracking-tight">{value}</div>
-          <div className="text-slate-500 text-sm font-medium mt-1">{title}</div>
+        <div className="relative z-10 mt-1">
+          <div className="text-2xl font-bold text-slate-800 tracking-tight">{value}</div>
+          <div className="text-slate-500 text-xs font-medium uppercase tracking-wider mt-0.5">{title}</div>
         </div>
       </div>
     );
@@ -141,45 +140,45 @@ export default function Dashboard() {
       </div>
 
       {/* System Activity Placeholder */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-premium p-6 mt-6">
-        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+      <div className="bg-white rounded-sm border border-slate-200 shadow-flat p-6 mt-6">
+        <h2 className="text-base font-bold text-slate-800 mb-6 flex items-center gap-2 uppercase tracking-wide">
           <Activity className="w-5 h-5 text-primary" /> Recent System Activity
         </h2>
-        <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+        <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-px before:bg-slate-200">
           <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-100 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-              <Package className="w-4 h-4" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white bg-slate-100 text-slate-500 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+              <Package className="w-3.5 h-3.5" />
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+            <div className="w-[calc(100%-3.5rem)] md:w-[calc(50%-2rem)] bg-white p-4 rounded-sm border border-slate-200 shadow-flat">
               <div className="flex items-center justify-between mb-1">
-                <div className="font-bold text-slate-800 text-sm">Shipment CC-1020 Dispatched</div>
+                <div className="font-bold text-primary text-sm">Shipment CC-1020 Dispatched</div>
                 <time className="text-xs text-slate-500">10 mins ago</time>
               </div>
-              <div className="text-slate-500 text-sm">Vaccine shipment left Miami distribution center.</div>
+              <div className="text-slate-600 text-sm">Vaccine shipment left Miami distribution center.</div>
             </div>
           </div>
           <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-red-50 text-red-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white bg-red-50 text-red-500 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+              <AlertTriangle className="w-3.5 h-3.5" />
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+            <div className="w-[calc(100%-3.5rem)] md:w-[calc(50%-2rem)] bg-white p-4 rounded-sm border border-slate-200 shadow-flat">
               <div className="flex items-center justify-between mb-1">
-                <div className="font-bold text-slate-800 text-sm">Temperature Excursion</div>
+                <div className="font-bold text-red-600 text-sm">Temperature Excursion</div>
                 <time className="text-xs text-slate-500">1 hour ago</time>
               </div>
-              <div className="text-slate-500 text-sm">Shipment CC-0982 exceeded maximum threshold (8.2°C).</div>
+              <div className="text-slate-600 text-sm">Shipment CC-0982 exceeded maximum threshold (8.2°C).</div>
             </div>
           </div>
           <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-blue-50 text-blue-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-              <WifiOff className="w-4 h-4" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white bg-blue-50 text-blue-500 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+              <WifiOff className="w-3.5 h-3.5" />
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+            <div className="w-[calc(100%-3.5rem)] md:w-[calc(50%-2rem)] bg-white p-4 rounded-sm border border-slate-200 shadow-flat">
               <div className="flex items-center justify-between mb-1">
-                <div className="font-bold text-slate-800 text-sm">Device ESP-005 Offline</div>
+                <div className="font-bold text-primary text-sm">Device ESP-005 Offline</div>
                 <time className="text-xs text-slate-500">2 hours ago</time>
               </div>
-              <div className="text-slate-500 text-sm">Lost heartbeat connection in transit zone.</div>
+              <div className="text-slate-600 text-sm">Lost heartbeat connection in transit zone.</div>
             </div>
           </div>
         </div>

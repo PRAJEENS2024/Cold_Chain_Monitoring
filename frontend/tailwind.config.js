@@ -7,20 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#f8fafc',
+        background: '#f1f3f6', // Flipkart light gray background
         card: '#ffffff',
-        primary: '#4f46e5',
-        primaryHover: '#4338ca',
-        success: '#10b981',
-        warning: '#f59e0b',
-        critical: '#ef4444',
+        primary: '#2874f0', // Flipkart Blue
+        primaryHover: '#1c5ccb',
+        accent: '#ffe500', // Flipkart Yellow
+        success: '#388e3c', // Material green often used in eCommerce
+        warning: '#ff9000', // Deep orange for warnings
+        critical: '#ff6161', // Red for critical errors
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Roboto', 'system-ui', 'sans-serif'], // Flipkart uses Roboto heavily
       },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-        'premium': '0 10px 40px -10px rgba(0,0,0,0.08)',
+        'flat': '0 1px 2px 0 rgba(0,0,0,0.1)',
+        'elevated': '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
       }
     },
   },
