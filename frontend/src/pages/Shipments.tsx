@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import { Package, Plus, Search } from 'lucide-react';
+import { Package, Search, Plus, X, MapPin, Truck, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Shipments() {
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedShipment, setSelectedShipment] = useState<any>(null);
 
   const fetchShipments = async () => {
     try {
@@ -91,7 +93,7 @@ export default function Shipments() {
                   </td>
                   <td className="p-5 font-medium text-slate-600">{s.destination}</td>
                   <td className="p-5 text-right">
-                    <button onClick={() => alert(`Opening tracking details for ${s.shipment_id}`)} className="text-primary hover:text-primaryHover font-semibold text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-sm transition-colors opacity-0 group-hover:opacity-100">
+                    <button onClick={() => setSelectedShipment(s)} className="text-primary hover:text-primaryHover font-semibold text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-sm transition-colors opacity-0 group-hover:opacity-100">
                       View Details
                     </button>
                   </td>
@@ -101,6 +103,78 @@ export default function Shipments() {
           </table>
         )}
       </div>
+
+      {/* Tracking Details Modal */}
+      <AnimatePresence>
+        {selectedShipment && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60" onClick={() => setSelectedShipment(null)}
+            ></motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-sm shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden"
+            >
+              <div className="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Shipment Details</h2>
+                  <p className="text-sm text-slate-500 font-medium mt-1">ID: {selectedShipment.shipment_id}</p>
+                </div>
+                <button onClick={() => setSelectedShipment(null)} className="text-slate-400 hover:text-slate-600 bg-white hover:bg-slate-100 p-2 rounded-sm border border-slate-200 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-4 rounded-sm border border-slate-200">
+                    <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Product</div>
+                    <div className="font-semibold text-slate-800">{selectedShipment.product_name}</div>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-sm border border-slate-200">
+                    <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Status</div>
+                    <div className="font-semibold text-primary">{selectedShipment.status}</div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-sm p-5">
+                  <h3 className="font-bold text-slate-800 mb-4">Tracking History</h3>
+                  <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[13px] before:-translate-x-px md:before:mx-0 md:before:translate-x-0 before:h-full before:w-0.5 before:bg-slate-200">
+                    <div className="relative flex items-center gap-4">
+                      <div className="w-7 h-7 rounded-full bg-emerald-100 border-2 border-emerald-500 flex items-center justify-center relative z-10 shrink-0">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-slate-800 text-sm">Dispatched from Facility</div>
+                        <div className="text-xs text-slate-500">Oct 12, 08:30 AM</div>
+                      </div>
+                    </div>
+                    <div className="relative flex items-center gap-4">
+                      <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-primary flex items-center justify-center relative z-10 shrink-0">
+                        <Truck className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-slate-800 text-sm">In Transit - Last Ping: Miami Hub</div>
+                        <div className="text-xs text-slate-500">Oct 13, 02:15 PM</div>
+                      </div>
+                    </div>
+                    <div className="relative flex items-center gap-4">
+                      <div className="w-7 h-7 rounded-full bg-slate-100 border-2 border-slate-300 flex items-center justify-center relative z-10 shrink-0">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                      </div>
+                      <div className="flex-1 opacity-50">
+                        <div className="font-semibold text-slate-800 text-sm">Expected Arrival: {selectedShipment.destination}</div>
+                        <div className="text-xs text-slate-500">Oct 15, Pending</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
