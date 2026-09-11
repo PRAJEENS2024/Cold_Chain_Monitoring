@@ -9,7 +9,7 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-slate-800 antialiased m-0;
+    @apply bg-background text-slate-800 antialiased selection:bg-primary/20 selection:text-primary m-0;
     font-family: 'Inter', system-ui, sans-serif;
   }
 }
