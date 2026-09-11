@@ -85,6 +85,56 @@ export default function Landing() {
           </div>
         </motion.div>
       </div>
+
+      {/* Features Section */}
+      <div className="bg-white border-y border-slate-200 py-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-800 mb-4">Everything you need to secure your supply chain</h2>
+            <p className="text-slate-500 font-medium max-w-2xl mx-auto">ColdChain connects directly with your IoT hardware to provide real-time alerts, AI predictions, and compliance reports.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-slate-50 border border-slate-200 p-8 rounded-sm hover:-translate-y-1 transition-transform">
+              <div className="w-12 h-12 bg-blue-100 border border-primary text-primary flex items-center justify-center rounded-sm mb-6">
+                <Activity className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-3">Live Telemetry</h3>
+              <p className="text-slate-600">Connect ESP32 devices seamlessly. Monitor temperature and door states in real-time across your entire fleet.</p>
+            </div>
+            
+            <div className="bg-slate-50 border border-slate-200 p-8 rounded-sm hover:-translate-y-1 transition-transform">
+              <div className="w-12 h-12 bg-yellow-100 border border-accent text-yellow-600 flex items-center justify-center rounded-sm mb-6">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-3">Automated Alerts</h3>
+              <p className="text-slate-600">Set custom thresholds and receive instant notifications if a shipment experiences a temperature excursion.</p>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200 p-8 rounded-sm hover:-translate-y-1 transition-transform">
+              <div className="w-12 h-12 bg-emerald-100 border border-emerald-500 text-emerald-600 flex items-center justify-center rounded-sm mb-6">
+                <Cpu className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-3">AI Predictions</h3>
+              <p className="text-slate-600">Leverage predictive models to forecast future temperature trends before an excursion actually happens.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 py-12 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-6 text-center text-slate-400">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <Activity className="w-6 h-6 text-primary" />
+            <span className="text-xl font-bold text-white tracking-tight">ColdChain</span>
+          </div>
+          <p className="mb-6 font-medium">Enterprise logistics and temperature monitoring, rebuilt for the modern web.</p>
+          <div className="text-sm">
+            &copy; {new Date().getFullYear()} ColdChain Logistics. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
