@@ -49,13 +49,16 @@ export default function Devices() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Devices</h1>
-          <p className="text-slate-500">Manage and track your IoT devices (ESP32, etc).</p>
+          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Devices</h1>
+          <p className="text-slate-500 font-medium mt-1">Manage physical hardware and IoT sensors.</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-          <Plus className="w-4 h-4" /> Register Device
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] font-semibold"
+        >
+          <Plus className="w-5 h-5" /> Register Device
         </button>
       </div>
 
@@ -70,38 +73,51 @@ export default function Devices() {
             />
           </div>
         </div>
-        
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-slate-500">Loading devices...</div>
+          <div className="p-12 text-center text-slate-500 font-medium">Loading devices...</div>
         ) : devices.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 flex flex-col items-center">
-             <Cpu className="w-12 h-12 mb-4 text-slate-300" />
-             <p>No devices found. Register one to get started.</p>
+          <div className="p-16 text-center text-slate-500 flex flex-col items-center">
+             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+               <Cpu className="w-10 h-10 text-slate-400" />
+             </div>
+             <p className="text-lg font-medium text-slate-700">No devices found.</p>
+             <p className="text-sm mt-1">Register an ESP32 device to start monitoring.</p>
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-sm font-medium text-slate-500">
-                <th className="p-4">Device ID</th>
-                <th className="p-4">Name</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Firmware</th>
-                <th className="p-4 text-right">Actions</th>
+              <tr className="bg-slate-50/50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <th className="p-5">Device ID</th>
+                <th className="p-5">Name</th>
+                <th className="p-5">Hardware MAC</th>
+                <th className="p-5">Firmware</th>
+                <th className="p-5">Status</th>
+                <th className="p-5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-50">
               {devices.map((d: any) => (
-                <tr key={d.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-4 font-medium text-slate-800">{d.device_id}</td>
-                  <td className="p-4 text-slate-600">{d.name} <span className="text-xs text-slate-400 block">{d.esp32_identifier}</span></td>
-                  <td className="p-4">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${d.status === 'ONLINE' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}`}>
+                <tr key={d.id} className="hover:bg-slate-50/80 transition-colors group">
+                  <td className="p-5 font-bold text-slate-800">{d.device_id}</td>
+                  <td className="p-5 font-semibold text-slate-700">{d.name}</td>
+                  <td className="p-5">
+                    <code className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-mono">{d.esp32_identifier}</code>
+                  </td>
+                  <td className="p-5 font-medium text-slate-500">v{d.firmware_version}</td>
+                  <td className="p-5">
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 w-max ${
+                      d.status === 'ONLINE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'
+                    }`}>
+                      {d.status === 'ONLINE' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>}
+                      {d.status === 'OFFLINE' && <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>}
                       {d.status}
                     </span>
                   </td>
-                  <td className="p-4 text-slate-600">{d.firmware_version}</td>
-                  <td className="p-4 text-right">
-                    <button className="text-primary hover:text-blue-700 font-medium text-sm">View</button>
+                  <td className="p-5 text-right">
+                    <button className="text-primary hover:text-primaryHover font-semibold text-sm bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                      Configure
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -109,41 +125,63 @@ export default function Devices() {
           </table>
         )}
       </div>
+      </div>
 
-      {/* Add Device Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-            <div className="flex justify-between items-center p-6 border-b border-slate-100">
+      {/* Registration Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 overflow-hidden">
+            <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               <h2 className="text-xl font-bold text-slate-800">Register New Device</h2>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
+              <p className="text-sm text-slate-500 font-medium mt-1">Connect a physical ESP32 or simulated unit.</p>
             </div>
-            <form onSubmit={handleAddDevice} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Device ID *</label>
-                <input required name="device_id" value={formData.device_id} onChange={handleInputChange} type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="e.g. ESP-001" />
+            
+            <form onSubmit={handleRegister} className="p-6 space-y-5">
+              {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100">{error}</div>}
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Device ID</label>
+                  <input required name="device_id" type="text" placeholder="e.g. ESP-005" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50 focus:bg-white" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Display Name</label>
+                  <input required name="name" type="text" placeholder="e.g. Warehouse Temp Sensor 1" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50 focus:bg-white" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">MAC Address / Identifier</label>
+                  <input required name="esp32_identifier" type="text" placeholder="00:00:00:00:00:00" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50 focus:bg-white font-mono text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Firmware Version</label>
+                  <input required name="firmware_version" type="text" defaultValue="1.0.0" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50 focus:bg-white" />
+                </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <Wifi className="w-4 h-4 text-primary" /> ThingSpeak Configuration
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Channel ID (Optional)</label>
+                      <input name="thingspeak_channel_id" type="text" placeholder="e.g. 3483882" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50 focus:bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Read API Key (Optional)</label>
+                      <input name="thingspeak_read_key" type="password" placeholder="e.g. XXXX" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all bg-slate-50 focus:bg-white" />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                <input name="name" value={formData.name} onChange={handleInputChange} type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Cold Chain Sensor Alpha" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">ESP32 MAC / Identifier</label>
-                <input name="esp32_identifier" value={formData.esp32_identifier} onChange={handleInputChange} type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="00:11:22:33:44:55" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">ThingSpeak Channel ID</label>
-                <input name="thingspeak_channel_id" value={formData.thingspeak_channel_id} onChange={handleInputChange} type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="e.g. 1234567" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">ThingSpeak Read API Key</label>
-                <input name="thingspeak_read_key" value={formData.thingspeak_read_key} onChange={handleInputChange} type="text" className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="16-character key" />
-              </div>
-              <div className="pt-4 flex justify-end gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-50 rounded-lg transition-colors">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-primary hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">Save Device</button>
+              
+              <div className="flex gap-3 pt-6 border-t border-slate-100">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-2.5 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" disabled={isSubmitting} className="flex-1 bg-primary hover:bg-primaryHover text-white px-4 py-2.5 rounded-xl font-semibold shadow-[0_4px_14px_0_rgba(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] transition-all disabled:opacity-50">
+                  {isSubmitting ? 'Registering...' : 'Register Device'}
+                </button>
               </div>
             </form>
           </div>

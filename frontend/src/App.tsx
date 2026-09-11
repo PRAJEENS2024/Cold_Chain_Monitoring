@@ -9,9 +9,9 @@ import LiveMonitoring from './pages/LiveMonitoring';
 import Alerts from './pages/Alerts';
 import Reports from './pages/Reports';
 
-// Placeholder Pages
+// Placeholder Pages (now implemented)
 import Devices from './pages/Devices';
-const Analytics = () => <div>Analytics</div>;
+import Analytics from './pages/Analytics';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, isLoading } = useAuth();
