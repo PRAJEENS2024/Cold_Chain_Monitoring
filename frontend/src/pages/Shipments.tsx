@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api';
 import { Package, Search, Plus, X, MapPin, Truck, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

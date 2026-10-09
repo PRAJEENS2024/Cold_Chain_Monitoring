@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, AlertTriangle, Activity, ShieldCheck, HelpCircle } from 'lucide-react';
+import { TrendingUp, ShieldCheck, HelpCircle } from 'lucide-react';
 
 export default function Analytics() {
   const [stats, setStats] = useState<any>(null);
@@ -94,7 +94,7 @@ export default function Analytics() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {accuracyData.map((entry, index) => (
+                  {accuracyData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
