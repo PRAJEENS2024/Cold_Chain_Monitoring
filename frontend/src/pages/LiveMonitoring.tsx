@@ -315,7 +315,7 @@ export default function LiveMonitoring() {
           </div>
 
           {/* 16x2 LCD Hardware Mirror */}
-          <div className="bg-gradient-to-br from-slate-900 to-[#0c1424] rounded-2xl border border-slate-700/80 shadow-premium p-6 text-white">
+          <div className="bg-gradient-to-br from-slate-800 via-[#101b2f] to-[#0a1220] dark:from-slate-900 dark:via-[#0c1524] dark:to-[#070b14] rounded-2xl border border-slate-700/80 shadow-premium p-6 text-white transition-colors duration-300">
             <div className="flex justify-between items-center mb-4">
               <div className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-accent" /> Physical 16x2 LCD Mirror
