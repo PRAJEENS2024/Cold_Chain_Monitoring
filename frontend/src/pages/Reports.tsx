@@ -21,6 +21,13 @@ export default function Reports() {
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
+
   useEffect(() => {
     api.get('/shipments').then(res => setShipments(res.data)).catch(console.error);
   }, []);
@@ -31,6 +38,7 @@ export default function Reports() {
     try {
       const res = await api.get(`/analytics/shipment/${selectedShipment}/report`);
       setReport(res.data);
+      showToast('21 CFR Part 11 Audit Certificate Compiled');
     } catch (e) {
       console.error(e);
     } finally {
@@ -61,10 +69,18 @@ export default function Reports() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    showToast(`Downloaded coldchain_audit_${report.shipment_id}.csv`);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Toast Feedback */}
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 font-bold text-xs animate-bounce">
+          <CheckCircle2 className="w-4 h-4 text-white" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
       {/* Header Banner */}
       <div className="bg-white dark:bg-[#0f172a] p-6 rounded-2xl shadow-premium dark:shadow-premium-dark border border-slate-200/90 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors duration-300">
         <div>
@@ -113,7 +129,7 @@ export default function Reports() {
         {report && report.status !== 'no_data' && !report.error && (
           <div className="border border-slate-200/90 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
             {/* Report Header Bar */}
-            <div className="bg-gradient-to-r from-slate-900 via-[#0e172a] to-[#0a1120] p-6 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="bg-gradient-to-r from-blue-700 via-primary to-indigo-800 dark:from-slate-900 dark:via-[#0e172a] dark:to-[#0a1120] p-6 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors duration-300">
               <div>
                 <div className="flex items-center gap-2.5">
                   <h3 className="font-extrabold text-lg font-heading text-white">Batch Certificate: {report.shipment_id}</h3>
