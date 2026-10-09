@@ -20,8 +20,16 @@ export default {
         sans: ['Roboto', 'system-ui', 'sans-serif'], // Flipkart uses Roboto heavily
       },
       boxShadow: {
-        'flat': '0 1px 2px 0 rgba(0,0,0,0.1)',
-        'elevated': '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
+        'flat': '0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04)',
+        'elevated': '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04)',
+        'premium': '0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04)',
+        'glow-primary': '0 0 20px -2px rgba(40, 116, 240, 0.35)',
+        'glow-success': '0 0 20px -2px rgba(16, 185, 129, 0.35)',
+        'glow-danger': '0 0 20px -2px rgba(239, 68, 68, 0.35)',
+        'inner-lcd': 'inset 0 2px 8px rgba(0, 0, 0, 0.75)',
+      },
+      transitionTimingFunction: {
+        'bounce-subtle': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       }
     },
   },
