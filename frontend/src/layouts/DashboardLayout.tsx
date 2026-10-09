@@ -9,7 +9,6 @@ import {
   BellRing, 
   FileText, 
   LogOut, 
-  Settings, 
   ChevronDown, 
   Menu,
   Radio,
