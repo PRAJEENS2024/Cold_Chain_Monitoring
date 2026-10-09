@@ -25,6 +25,12 @@ export default function Alerts() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'ACKNOWLEDGED'>('ALL');
   const [acknowledgingId, setAcknowledgingId] = useState<number | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
 
   const fetchAlerts = async () => {
     try {
@@ -48,10 +54,23 @@ export default function Alerts() {
     try {
       await api.post(`/api/iot/alerts/${id}/acknowledge`);
       await fetchAlerts();
+      showToast('Incident acknowledged and logged into audit ledger.');
     } catch (e) {
       console.error(e);
     } finally {
       setAcknowledgingId(null);
+    }
+  };
+
+  const handleAcknowledgeAll = async () => {
+    const activeAlerts = alerts.filter(a => a.status === 'ACTIVE');
+    if (activeAlerts.length === 0) return;
+    try {
+      await Promise.all(activeAlerts.map(a => api.post(`/api/iot/alerts/${a.id}/acknowledge`)));
+      await fetchAlerts();
+      showToast(`Acknowledged ${activeAlerts.length} active incident(s).`);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -66,7 +85,15 @@ export default function Alerts() {
   const warningCount = alerts.filter(a => a.severity === 'WARNING' && a.status === 'ACTIVE').length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Toast Feedback */}
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 font-bold text-xs animate-bounce">
+          <CheckCircle2 className="w-4 h-4 text-white" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="bg-white dark:bg-[#0f172a] p-6 rounded-2xl shadow-premium dark:shadow-premium-dark border border-slate-200/90 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors duration-300">
         <div>
@@ -91,39 +118,51 @@ export default function Alerts() {
           </p>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold">
-          <Filter className="w-3.5 h-3.5 text-slate-400 ml-2" />
-          <button
-            onClick={() => setFilter('ALL')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              filter === 'ALL' 
-                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' 
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
-            }`}
-          >
-            All ({alerts.length})
-          </button>
-          <button
-            onClick={() => setFilter('ACTIVE')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              filter === 'ACTIVE' 
-                ? 'bg-white dark:bg-slate-900 text-red-600 dark:text-red-400 shadow-sm' 
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
-            }`}
-          >
-            Active ({activeCount})
-          </button>
-          <button
-            onClick={() => setFilter('ACKNOWLEDGED')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              filter === 'ACKNOWLEDGED' 
-                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' 
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
-            }`}
-          >
-            Acknowledged
-          </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {activeCount > 0 && (
+            <button
+              onClick={handleAcknowledgeAll}
+              className="px-3.5 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md shadow-red-500/20 flex items-center gap-1.5 active:scale-95"
+            >
+              <Check className="w-3.5 h-3.5" />
+              Acknowledge All ({activeCount})
+            </button>
+          )}
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold">
+            <Filter className="w-3.5 h-3.5 text-slate-400 ml-2" />
+            <button
+              onClick={() => setFilter('ALL')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                filter === 'ALL' 
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' 
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+              }`}
+            >
+              All ({alerts.length})
+            </button>
+            <button
+              onClick={() => setFilter('ACTIVE')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                filter === 'ACTIVE' 
+                  ? 'bg-white dark:bg-slate-900 text-red-600 dark:text-red-400 shadow-sm' 
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+              }`}
+            >
+              Active ({activeCount})
+            </button>
+            <button
+              onClick={() => setFilter('ACKNOWLEDGED')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                filter === 'ACKNOWLEDGED' 
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm' 
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+              }`}
+            >
+              Acknowledged
+            </button>
+          </div>
         </div>
       </div>
 
@@ -216,7 +255,7 @@ export default function Alerts() {
                     <button 
                       onClick={() => handleAcknowledge(alert.id)}
                       disabled={acknowledgingId === alert.id}
-                      className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 dark:from-primary dark:to-blue-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow active:scale-98 disabled:opacity-50 flex items-center gap-2 justify-center"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-primary to-blue-600 dark:from-blue-600 dark:to-cyan-600 hover:opacity-90 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-primary/20 active:scale-98 disabled:opacity-50 flex items-center gap-2 justify-center"
                     >
                       <Check className="w-3.5 h-3.5" />
                       {acknowledgingId === alert.id ? 'Recording Audit...' : 'Acknowledge Incident'}
