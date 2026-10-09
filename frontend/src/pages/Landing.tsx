@@ -567,33 +567,33 @@ export default function Landing() {
           </div>
 
           {/* Tier 2: $5,000 Enterprise Turnkey Package (FEATURED) */}
-          <div className="p-8 sm:p-9 rounded-3xl bg-gradient-to-b from-slate-900 to-[#0c1524] text-white border-2 border-primary dark:border-cyan-400 shadow-2xl relative flex flex-col justify-between transform md:-translate-y-3">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-cyan-400 text-slate-950 font-black text-xs uppercase px-4 py-1 rounded-full shadow-lg flex items-center gap-1">
+          <div className="p-8 sm:p-9 rounded-3xl bg-gradient-to-b from-blue-600 via-primary to-indigo-800 dark:from-slate-900 dark:via-[#101b2f] dark:to-[#0c1524] text-white border-2 border-accent dark:border-cyan-400 shadow-2xl shadow-primary/25 relative flex flex-col justify-between transform md:-translate-y-3 transition-colors duration-300">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-accent dark:bg-gradient-to-r dark:from-primary dark:to-cyan-400 text-slate-950 font-black text-xs uppercase px-4 py-1 rounded-full shadow-lg flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" /> Commercial Turnkey License ($5,000)
             </div>
             <div>
               <div className="flex justify-between items-start mt-2">
                 <div>
                   <h3 className="text-2xl font-black text-white font-heading">Enterprise Pro</h3>
-                  <p className="text-xs text-slate-400 mt-1">Full turnkey supply chain installation</p>
+                  <p className="text-xs text-blue-100 dark:text-slate-400 mt-1">Full turnkey supply chain installation</p>
                 </div>
               </div>
               <div className="my-6">
                 <span className="text-5xl font-black text-white font-heading">$5,000</span>
-                <span className="text-cyan-300 text-xs font-semibold"> / turnkey package</span>
+                <span className="text-yellow-300 dark:text-cyan-300 text-xs font-semibold"> / turnkey package</span>
               </div>
-              <ul className="space-y-3 text-sm text-slate-200 font-medium">
-                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" /> Full Source Code & Commercial Transfer</li>
-                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" /> Turnkey ESP32 Hardware + 16x2 LCD</li>
-                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" /> Dedicated ThingSpeak & FastAPI Ingestion</li>
-                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" /> 21 CFR Part 11 Compliance Auditing Suite</li>
-                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" /> Real-time Oscilloscope Telemetry & Alerts</li>
-                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" /> 1-Year Priority Hardware & Cloud SLA</li>
+              <ul className="space-y-3 text-sm text-blue-50 dark:text-slate-200 font-medium">
+                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-accent dark:text-cyan-400 shrink-0" /> Full Source Code & Commercial Transfer</li>
+                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-accent dark:text-cyan-400 shrink-0" /> Turnkey ESP32 Hardware + 16x2 LCD</li>
+                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-accent dark:text-cyan-400 shrink-0" /> Dedicated ThingSpeak & FastAPI Ingestion</li>
+                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-accent dark:text-cyan-400 shrink-0" /> 21 CFR Part 11 Compliance Auditing Suite</li>
+                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-accent dark:text-cyan-400 shrink-0" /> Real-time Oscilloscope Telemetry & Alerts</li>
+                <li className="flex items-center gap-2.5"><CheckCircle2 className="w-4 h-4 text-accent dark:text-cyan-400 shrink-0" /> 1-Year Priority Hardware & Cloud SLA</li>
               </ul>
             </div>
             <button 
               onClick={() => navigate('/signup')}
-              className="mt-8 w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 transition-all text-sm active:scale-98"
+              className="mt-8 w-full py-3.5 rounded-xl bg-accent hover:bg-yellow-400 dark:bg-gradient-to-r dark:from-cyan-400 dark:to-blue-500 dark:hover:from-cyan-300 dark:hover:to-blue-400 text-slate-950 font-black shadow-lg shadow-accent/25 transition-all text-sm active:scale-98"
             >
               Acquire Turnkey Platform
             </button>
