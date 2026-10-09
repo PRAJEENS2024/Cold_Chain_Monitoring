@@ -86,11 +86,11 @@ class Device(Base):
 class TemperatureReading(Base):
     __tablename__ = "temperature_readings"
     id = Column(Integer, primary_key=True, index=True)
-    shipment_id = Column(Integer, ForeignKey("shipments.id"))
+    shipment_id = Column(Integer, ForeignKey("shipments.id"), nullable=True)
     device_id = Column(Integer, ForeignKey("devices.id"))
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     temperature = Column(Float, nullable=False)
-    data_source = Column(String, default="SIMULATOR")  # SIMULATOR or ESP32
+    data_source = Column(String, default="SIMULATOR")  # SIMULATOR or ESP32 or THINGSPEAK
     
     shipment = relationship("Shipment", back_populates="temperature_readings")
     device = relationship("Device")
@@ -98,7 +98,7 @@ class TemperatureReading(Base):
 class DoorEvent(Base):
     __tablename__ = "door_events"
     id = Column(Integer, primary_key=True, index=True)
-    shipment_id = Column(Integer, ForeignKey("shipments.id"))
+    shipment_id = Column(Integer, ForeignKey("shipments.id"), nullable=True)
     device_id = Column(Integer, ForeignKey("devices.id"))
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     state = Column(Enum(DoorStateEnum), nullable=False)
@@ -110,7 +110,7 @@ class DoorEvent(Base):
 class Alert(Base):
     __tablename__ = "alerts"
     id = Column(Integer, primary_key=True, index=True)
-    shipment_id = Column(Integer, ForeignKey("shipments.id"))
+    shipment_id = Column(Integer, ForeignKey("shipments.id"), nullable=True)
     device_id = Column(Integer, ForeignKey("devices.id"))
     alert_type = Column(Enum(AlertTypeEnum), nullable=False)
     severity = Column(Enum(AlertSeverityEnum), nullable=False)

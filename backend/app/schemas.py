@@ -7,13 +7,19 @@ from .models import RoleEnum, AlertSeverityEnum, AlertStatusEnum, DeviceStatusEn
 class UserBase(BaseModel):
     username: str
     email: str
-    role: RoleEnum = RoleEnum.OPERATOR
+    role: Optional[RoleEnum] = RoleEnum.OPERATOR
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    username: str
+    email: str
     password: str
+    role: Optional[str] = "OPERATOR"
 
-class UserResponse(UserBase):
+class UserResponse(BaseModel):
     id: int
+    username: str
+    email: str
+    role: RoleEnum
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
@@ -102,3 +108,18 @@ class AlertResponse(BaseModel):
     created_at: datetime
     acknowledged_at: Optional[datetime] = None
     model_config = ConfigDict(from_attributes=True)
+
+class ReadingPoint(BaseModel):
+    time: str
+    temp: float
+
+class DeviceTelemetryResponse(BaseModel):
+    device_id: str
+    status: str
+    last_seen: Optional[datetime] = None
+    last_updated_seconds_ago: Optional[int] = None
+    current_temp: Optional[float] = None
+    door_open: bool = False
+    door_status: str = "CLOSED"
+    readings: List[ReadingPoint] = []
+    message: Optional[str] = None

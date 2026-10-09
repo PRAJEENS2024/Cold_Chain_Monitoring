@@ -26,8 +26,10 @@ def create_device(device: schemas.DeviceCreate, db: Session = Depends(database.g
     return new_device
 
 @router.get("/{device_id}", response_model=schemas.DeviceResponse)
-def get_device(device_id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
-    device = db.query(models.Device).filter(models.Device.id == device_id).first()
+def get_device(device_id: str, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    device = db.query(models.Device).filter(models.Device.device_id == device_id).first()
+    if not device and device_id.isdigit():
+        device = db.query(models.Device).filter(models.Device.id == int(device_id)).first()
     if not device:
         raise HTTPException(status_code=404, detail="Device not found")
     return device
