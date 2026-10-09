@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,10 +7,14 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   body {
     @apply bg-[#f1f3f6] text-slate-800 antialiased selection:bg-primary/20 selection:text-primary m-0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  html.dark body {
+    @apply bg-[#090d16] text-slate-100 selection:bg-cyanGlow/20 selection:text-cyanGlow;
   }
   h1, h2, h3, .font-heading {
     font-family: 'Outfit', 'Inter', system-ui, sans-serif;
@@ -29,33 +33,46 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.5);
+  background: rgba(148, 163, 184, 0.4);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.8);
+  background: rgba(100, 116, 139, 0.7);
 }
 
-/* Glassmorphism & Enterprise UI Surfaces */
+/* Adaptive Glassmorphism Panels */
 .glass-panel {
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
-.glass-panel-dark {
-  background: rgba(15, 23, 42, 0.92);
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  border: 1px solid rgba(30, 41, 59, 0.85);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card-subtle {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+.dark .glass-card-subtle {
+  background: rgba(22, 32, 51, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(30, 41, 59, 0.7);
 }
 
 /* 16x2 I2C LCD Matrix Simulator */
 .lcd-screen-container {
   background: linear-gradient(145deg, #0b1a20 0%, #031114 100%);
   border: 3px solid #1a3a40;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8), 0 4px 14px rgba(0, 234, 255, 0.12);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.85), 0 4px 16px rgba(0, 234, 255, 0.18);
   position: relative;
   overflow: hidden;
 }
@@ -65,7 +82,7 @@
   display: block;
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
   z-index: 10;
   background-size: 100% 3px, 6px 100%;
   pointer-events: none;
@@ -73,11 +90,20 @@
 
 .lcd-glow-text {
   color: #00ffcc;
-  text-shadow: 0 0 8px rgba(0, 255, 204, 0.6), 0 0 16px rgba(0, 255, 204, 0.25);
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.6), 0 0 16px rgba(0, 255, 204, 0.3);
   letter-spacing: 0.12em;
 }
 
-/* Animation Keyframes */
+/* Radial Temperature Gauge Arc */
+.gauge-svg {
+  filter: drop-shadow(0 4px 10px rgba(40, 116, 240, 0.2));
+}
+
+.dark .gauge-svg {
+  filter: drop-shadow(0 4px 14px rgba(0, 255, 204, 0.25));
+}
+
+/* Animations */
 @keyframes pulseGlow {
   0%, 100% {
     box-shadow: 0 0 15px -3px rgba(40, 116, 240, 0.35);
@@ -103,7 +129,7 @@
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
   }
 }
 
@@ -116,6 +142,17 @@
   }
 }
 
+@keyframes orbGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
 .animate-pulse-glow {
   animation: pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -125,7 +162,11 @@
 }
 
 .animate-float {
-  animation: floatGentle 4s ease-in-out infinite;
+  animation: floatGentle 5s ease-in-out infinite;
+}
+
+.animate-orb {
+  animation: orbGlow 6s ease-in-out infinite;
 }
 
 .shimmer-badge {
