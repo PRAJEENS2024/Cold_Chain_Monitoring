@@ -21,7 +21,9 @@ import {
   TrendingUp, 
   HelpCircle, 
   Sparkles, 
-  Thermometer
+  Thermometer,
+  Download,
+  CheckCircle2
 } from 'lucide-react';
 
 export default function Analytics() {
@@ -29,6 +31,12 @@ export default function Analytics() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'30d' | '90d' | 'ytd'>('30d');
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -86,8 +94,37 @@ export default function Analytics() {
     { time: '+120m', actual: null, forecast: 4.6, upper: 5.5, lower: 3.7 },
   ];
 
+  const handleExportCsv = () => {
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + "Metric,Value,Timeframe\n"
+      + `Mean Kinetic Temperature,4.62 C,${timeRange}\n`
+      + `Predictive Accuracy,94.2%,${timeRange}\n`
+      + `Thermal Compliance Index,94%,${timeRange}\n`
+      + `Degradation Risk,<0.02%,${timeRange}\n`
+      + `Critical Excursions,${stats?.critical_shipments || 2},${timeRange}\n`
+      + `Warning Incidents,${stats?.warning_shipments || 7},${timeRange}\n`
+      + "Auditor Validation,GDP Compliant / 21 CFR Part 11,Current\n";
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `coldchain_analytics_${timeRange}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast(`Exported Analytics Report (${timeRange.toUpperCase()}) to CSV`);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Toast Feedback */}
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 font-bold text-xs animate-bounce">
+          <CheckCircle2 className="w-4 h-4 text-white" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="bg-white dark:bg-[#0f172a] p-6 rounded-2xl shadow-premium dark:shadow-premium-dark border border-slate-200/90 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-colors duration-300">
         <div>
@@ -99,21 +136,35 @@ export default function Analytics() {
           </p>
         </div>
 
-        {/* Timeframe Selector */}
-        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-          {(['30d', '90d', 'ytd'] as const).map(tr => (
-            <button
-              key={tr}
-              onClick={() => setTimeRange(tr)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                timeRange === tr 
-                  ? 'bg-white dark:bg-slate-900 text-primary dark:text-cyanGlow shadow-sm' 
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              {tr.toUpperCase()}
-            </button>
-          ))}
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {/* Timeframe Selector */}
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+            {(['30d', '90d', 'ytd'] as const).map(tr => (
+              <button
+                key={tr}
+                onClick={() => {
+                  setTimeRange(tr);
+                  showToast(`Switched analytics scope to ${tr.toUpperCase()}`);
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  timeRange === tr 
+                    ? 'bg-white dark:bg-slate-900 text-primary dark:text-cyanGlow shadow-sm' 
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {tr.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={handleExportCsv}
+            className="px-3.5 py-2 bg-gradient-to-r from-primary to-blue-600 hover:opacity-95 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-primary/20 flex items-center gap-1.5 active:scale-95 shrink-0"
+            title="Download Telemetry Analytics Dataset"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Export CSV</span>
+          </button>
         </div>
       </div>
 
@@ -207,32 +258,32 @@ export default function Analytics() {
         </div>
 
         {/* Mean Kinetic Temperature (MKT) & Quality Metrics */}
-        <div className="bg-gradient-to-br from-slate-900 via-[#101b2f] to-[#0a1220] rounded-2xl shadow-premium p-6 text-white border border-slate-700/80 flex flex-col justify-between">
+        <div className="bg-gradient-to-br from-blue-600 via-primary to-indigo-700 dark:from-slate-900 dark:via-[#101b2f] dark:to-[#0a1220] rounded-2xl shadow-premium p-6 text-white border border-blue-400/30 dark:border-slate-700/80 flex flex-col justify-between transition-colors duration-300">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-blue-400/30 dark:border-slate-800">
               <h2 className="text-base font-bold text-white flex items-center gap-2 font-heading">
                 <Thermometer className="w-5 h-5 text-accent" /> Mean Kinetic Temp (MKT)
               </h2>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-900/60 dark:bg-emerald-950 text-emerald-300 dark:text-emerald-400 border border-emerald-500/40 dark:border-emerald-800">
                 PASSED
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="text-xs text-blue-100/90 dark:text-slate-400 mt-2 font-medium">
               Arrhenius activation energy weighted thermal exposure metric:
             </p>
             <div className="my-4">
-              <div className="text-4xl font-black text-cyan-300 font-heading">4.62 °C</div>
-              <p className="text-xs text-slate-400 mt-0.5">Calculated over active logging window</p>
+              <div className="text-4xl font-black text-cyan-200 dark:text-cyan-300 font-heading">4.62 °C</div>
+              <p className="text-xs text-blue-100/80 dark:text-slate-400 mt-0.5">Calculated over active logging window</p>
             </div>
           </div>
           
-          <div className="space-y-2 text-xs border-t border-slate-800/80 pt-3">
-            <div className="flex justify-between text-slate-300">
-              <span className="text-slate-400">Degradation Risk:</span>
-              <span className="font-bold text-emerald-400">&lt; 0.02%</span>
+          <div className="space-y-2 text-xs border-t border-blue-400/30 dark:border-slate-800/80 pt-3">
+            <div className="flex justify-between text-blue-100 dark:text-slate-300">
+              <span className="text-blue-200 dark:text-slate-400">Degradation Risk:</span>
+              <span className="font-bold text-emerald-300 dark:text-emerald-400">&lt; 0.02%</span>
             </div>
-            <div className="flex justify-between text-slate-300">
-              <span className="text-slate-400">Total Excursions Prevented:</span>
+            <div className="flex justify-between text-blue-100 dark:text-slate-300">
+              <span className="text-blue-200 dark:text-slate-400">Total Excursions Prevented:</span>
               <span className="font-bold text-accent">1,204 incidents</span>
             </div>
           </div>
