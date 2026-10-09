@@ -174,3 +174,22 @@
   background-size: 200% 100%;
   animation: shimmerEffect 2.5s infinite;
 }
+
+/* Oscilloscope phosphor reticle glow */
+.oscilloscope-glow-line {
+  filter: drop-shadow(0 0 6px rgba(0, 255, 204, 0.6));
+}
+
+/* Print Styles for Regulatory Audit PDF Generation */
+@media print {
+  nav, aside, header, button, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .border, .border-b, .border-t {
+    border-color: #cbd5e1 !important;
+  }
+}
