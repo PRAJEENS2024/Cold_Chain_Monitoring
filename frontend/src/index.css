@@ -10,11 +10,19 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   body {
-    @apply bg-[#f1f3f6] text-slate-800 antialiased selection:bg-primary/20 selection:text-primary m-0;
+    @apply bg-[#f1f3f6] text-slate-800 antialiased m-0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
   html.dark body {
-    @apply bg-[#090d16] text-slate-100 selection:bg-cyanGlow/20 selection:text-cyanGlow;
+    @apply bg-[#090d16] text-slate-100;
+  }
+  ::selection {
+    background-color: rgba(40, 116, 240, 0.2);
+    color: #2874f0;
+  }
+  html.dark ::selection {
+    background-color: rgba(0, 255, 204, 0.2);
+    color: #00ffcc;
   }
   h1, h2, h3, .font-heading {
     font-family: 'Outfit', 'Inter', system-ui, sans-serif;
