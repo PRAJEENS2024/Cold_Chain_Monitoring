@@ -131,21 +131,21 @@ export default function DashboardLayout() {
         </nav>
 
         {/* Hardware Status Widget in Sidebar */}
-        <div className={`p-3 mx-3 mb-3 bg-gradient-to-br from-slate-900 to-slate-800 dark:from-[#111c30] dark:to-[#0c1524] rounded-2xl text-white shadow-md border border-slate-700/60 dark:border-slate-800 ${!isSidebarOpen && 'lg:hidden'}`}>
-          <div className="flex items-center justify-between pb-2 border-b border-slate-700/60 text-xs">
-            <span className="flex items-center gap-1.5 font-bold text-slate-200">
-              <Radio className="w-3.5 h-3.5 text-accent animate-pulse" /> Node ESP-001
+        <div className={`p-3.5 mx-3 mb-3 bg-gradient-to-br from-blue-50/90 to-indigo-50/90 dark:from-[#111c30] dark:to-[#0c1524] rounded-2xl text-slate-800 dark:text-white shadow-sm border border-blue-200/80 dark:border-slate-800 transition-colors duration-300 ${!isSidebarOpen && 'lg:hidden'}`}>
+          <div className="flex items-center justify-between pb-2 border-b border-blue-200/60 dark:border-slate-700/60 text-xs">
+            <span className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
+              <Radio className="w-3.5 h-3.5 text-primary dark:text-accent animate-pulse" /> Node ESP-001
             </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
           </div>
-          <div className="mt-2 space-y-1 text-[11px] text-slate-300">
-            <div className="flex justify-between">
-              <span className="text-slate-400">ThingSpeak Ch:</span>
-              <span className="font-mono text-cyan-300 font-semibold">3483882</span>
+          <div className="mt-2 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 dark:text-slate-400">ThingSpeak Ch:</span>
+              <span className="font-mono text-primary dark:text-cyan-300 font-bold">3483882</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Cadence:</span>
-              <span className="text-emerald-300 font-medium">15s Live Polling</span>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 dark:text-slate-400">Sync Cadence:</span>
+              <span className="text-emerald-600 dark:text-emerald-300 font-bold">15s Live Polling</span>
             </div>
           </div>
         </div>
