@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Activity, ShieldCheck, Cpu, ArrowRight } from 'lucide-react';
