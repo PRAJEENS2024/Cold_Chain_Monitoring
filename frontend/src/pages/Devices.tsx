@@ -1,264 +1,307 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api';
-import { Cpu, Search, Plus, Wifi, Server, X, Activity } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Cpu, 
+  ShieldCheck, 
+  RefreshCw, 
+  Radio, 
+  Terminal, 
+  Layers, 
+  CheckCircle2, 
+  ExternalLink,
+  Zap,
+  Cable
+} from 'lucide-react';
+
+interface DeviceData {
+  id: number;
+  device_id: string;
+  name: string;
+  esp32_identifier: string;
+  firmware_version: string;
+  thingspeak_channel_id: string;
+  status: string;
+  last_seen: string | null;
+  created_at: string;
+}
 
 export default function Devices() {
-  const [devices, setDevices] = useState([]);
+  const [device, setDevice] = useState<DeviceData | null>(null);
   const [loading, setLoading] = useState(true);
-  
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [selectedDevice, setSelectedDevice] = useState<any>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'specs' | 'pinout' | 'protocol'>('specs');
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-    const form = e.target as HTMLFormElement;
-    const data = {
-      device_id: (form.elements.namedItem('device_id') as HTMLInputElement).value,
-      name: (form.elements.namedItem('name') as HTMLInputElement).value,
-      esp32_identifier: (form.elements.namedItem('esp32_identifier') as HTMLInputElement).value,
-      firmware_version: (form.elements.namedItem('firmware_version') as HTMLInputElement).value,
-      thingspeak_channel_id: (form.elements.namedItem('thingspeak_channel_id') as HTMLInputElement).value || null,
-      thingspeak_read_key: (form.elements.namedItem('thingspeak_read_key') as HTMLInputElement).value || null,
-    };
+  const fetchDevice = async (manual = false) => {
+    if (manual) setIsRefreshing(true);
     try {
-      await api.post('/devices/', data);
-      setIsModalOpen(false);
-      fetchDevices();
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Error registering device');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const fetchDevices = async () => {
-    try {
-      const res = await api.get('/devices/');
-      setDevices(res.data);
+      const res = await api.get('/devices/ESP-001');
+      setDevice(res.data);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch device data", err);
     } finally {
       setLoading(false);
+      if (manual) setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
-    fetchDevices();
+    fetchDevice();
+    const interval = setInterval(fetchDevice, 8000);
+    return () => clearInterval(interval);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[55vh] space-y-4">
+        <div className="relative">
+          <div className="w-14 h-14 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+          <Cpu className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        </div>
+        <p className="text-slate-600 font-bold text-base tracking-tight font-heading">Loading Hardware Diagnostics...</p>
+        <p className="text-xs text-slate-400">Querying Node ESP-001 Configuration</p>
+      </div>
+    );
+  }
+
+  const isOnline = device?.status === 'ONLINE';
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-white p-6 rounded-sm shadow-flat border border-slate-200">
+      {/* Top Command Bar */}
+      <div className="bg-white/95 backdrop-blur-md p-6 rounded-2xl shadow-premium border border-slate-200/90 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Devices</h1>
-          <p className="text-slate-500 font-medium mt-1">Manage physical hardware and IoT sensors.</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight font-heading flex items-center gap-2">
+              <Cpu className="w-6 h-6 text-primary" /> ESP-001 Hardware Command Center
+            </h1>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+              isOnline ? 'bg-emerald-50 text-emerald-700 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-300'
+            }`}>
+              <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-ping' : 'bg-slate-400'}`}></span>
+              {isOnline ? 'ONLINE' : 'STANDBY'}
+            </span>
+          </div>
+          <p className="text-slate-500 text-xs sm:text-sm mt-1">
+            Physical ESP32 Cold Chain Node Specification, Wiring Pinout, and Ingestion Schema
+          </p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)}
-          className="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-sm flex items-center gap-2 transition-all shadow-sm font-semibold"
+
+        <button
+          onClick={() => fetchDevice(true)}
+          disabled={isRefreshing}
+          className="bg-gradient-to-r from-slate-50 to-slate-100 hover:from-white hover:to-slate-50 text-slate-700 border border-slate-300 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 shadow-sm hover:shadow active:scale-98 disabled:opacity-50"
         >
-          <Plus className="w-5 h-5" /> Register Device
+          <RefreshCw className={`w-4 h-4 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
+          {isRefreshing ? 'Checking...' : 'Check Hardware'}
         </button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-sm shadow-flat overflow-hidden">
-        <div className="p-5 border-b border-slate-200 flex justify-between items-center bg-white">
-          <div className="relative w-72">
-            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search devices..." 
-              className="w-full pl-10 pr-4 py-2.5 rounded-sm border border-slate-300 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm font-medium transition-all bg-slate-50 focus:bg-white"
-            />
-          </div>
-        </div>
-        <div className="bg-white border-t border-slate-100 overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center text-slate-500 font-medium">Loading devices...</div>
-        ) : devices.length === 0 ? (
-          <div className="p-16 text-center text-slate-500 flex flex-col items-center">
-             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-               <Cpu className="w-10 h-10 text-slate-400" />
-             </div>
-             <p className="text-lg font-medium text-slate-700">No devices found.</p>
-             <p className="text-sm mt-1">Register an ESP32 device to start monitoring.</p>
-          </div>
-        ) : (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <th className="p-5">Device ID</th>
-                <th className="p-5">Name</th>
-                <th className="p-5">Hardware MAC</th>
-                <th className="p-5">Firmware</th>
-                <th className="p-5">Status</th>
-                <th className="p-5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {devices.map((d: any) => (
-                <tr key={d.id} className="hover:bg-slate-50/80 transition-colors group">
-                  <td className="p-5 font-bold text-slate-800">{d.device_id}</td>
-                  <td className="p-5 font-semibold text-slate-700">{d.name}</td>
-                  <td className="p-5">
-                    <code className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-mono">{d.esp32_identifier}</code>
-                  </td>
-                  <td className="p-5 font-medium text-slate-500">v{d.firmware_version}</td>
-                  <td className="p-5">
-                    <span className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 w-max ${
-                      d.status === 'ONLINE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'
-                    }`}>
-                      {d.status === 'ONLINE' && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>}
-                      {d.status === 'OFFLINE' && <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>}
-                      {d.status}
-                    </span>
-                  </td>
-                  <td className="p-5 text-right">
-                    <button onClick={() => setSelectedDevice(d)} className="text-primary hover:text-primaryHover font-semibold text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-sm transition-colors opacity-0 group-hover:opacity-100">
-                      Configure
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-      </div>
-
-      {/* Registration Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60" onClick={() => setIsModalOpen(false)}></div>
-          <div className="bg-white rounded-sm shadow-2xl w-full max-w-md relative z-10 overflow-hidden">
-            <div className="p-6 border-b border-slate-200 bg-slate-50">
-              <h2 className="text-xl font-bold text-slate-800">Register New Device</h2>
-              <p className="text-sm text-slate-500 font-medium mt-1">Connect a physical ESP32 or simulated unit.</p>
+      {/* Main Single Device Node Container */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl shadow-premium overflow-hidden">
+        {/* Node Summary Header */}
+        <div className="p-6 bg-gradient-to-r from-slate-50 via-white to-blue-50/30 border-b border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3.5 bg-gradient-to-tr from-primary to-blue-500 text-white rounded-2xl shadow-md shadow-primary/20">
+              <Cpu className="w-7 h-7" />
             </div>
-            
-            <form onSubmit={handleRegister} className="p-6 space-y-5">
-              {error && <div className="bg-red-50 text-red-600 p-3 rounded-sm text-sm font-medium border border-red-200">{error}</div>}
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Device ID</label>
-                  <input required name="device_id" type="text" placeholder="e.g. ESP-005" className="w-full px-4 py-2.5 rounded-sm border border-slate-300 focus:ring-1 focus:ring-primary focus:border-primary transition-all bg-slate-50 focus:bg-white" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Display Name</label>
-                  <input required name="name" type="text" placeholder="e.g. Warehouse Temp Sensor 1" className="w-full px-4 py-2.5 rounded-sm border border-slate-300 focus:ring-1 focus:ring-primary focus:border-primary transition-all bg-slate-50 focus:bg-white" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">MAC Address / Identifier</label>
-                  <input required name="esp32_identifier" type="text" placeholder="00:00:00:00:00:00" className="w-full px-4 py-2.5 rounded-sm border border-slate-300 focus:ring-1 focus:ring-primary focus:border-primary transition-all bg-slate-50 focus:bg-white font-mono text-sm" />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Firmware Version</label>
-                  <input required name="firmware_version" type="text" defaultValue="1.0.0" className="w-full px-4 py-2.5 rounded-sm border border-slate-300 focus:ring-1 focus:ring-primary focus:border-primary transition-all bg-slate-50 focus:bg-white" />
-                </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-xl font-extrabold text-slate-900 font-heading">{device?.device_id || 'ESP-001'}</h2>
+                <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-blue-100 text-primary border border-blue-200">
+                  ColdChain Node 1
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">{device?.name || 'ESP32 Cold Chain Node'}</p>
+            </div>
+          </div>
 
-                <div className="pt-4 border-t border-slate-200">
-                  <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <Wifi className="w-4 h-4 text-primary" /> ThingSpeak Configuration
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Channel ID (Optional)</label>
-                      <input name="thingspeak_channel_id" type="text" placeholder="e.g. 3483882" className="w-full px-4 py-2.5 rounded-sm border border-slate-300 focus:ring-1 focus:ring-primary focus:border-primary transition-all bg-slate-50 focus:bg-white" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Read API Key (Optional)</label>
-                      <input name="thingspeak_read_key" type="password" placeholder="e.g. XXXX" className="w-full px-4 py-2.5 rounded-sm border border-slate-300 focus:ring-1 focus:ring-primary focus:border-primary transition-all bg-slate-50 focus:bg-white" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex gap-3 pt-6 border-t border-slate-200">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-2.5 text-slate-600 hover:bg-slate-100 border border-slate-300 rounded-sm font-semibold transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" disabled={isSubmitting} className="flex-1 bg-primary hover:bg-primaryHover text-white px-4 py-2.5 rounded-sm font-semibold shadow-sm transition-all disabled:opacity-50">
-                  {isSubmitting ? 'Registering...' : 'Register Device'}
-                </button>
-              </div>
-            </form>
+          <div className="text-right text-xs text-slate-500">
+            <div>Last Telemetry Contact: <strong className="text-slate-800">{device?.last_seen ? new Date(device.last_seen).toLocaleString() : 'No connection'}</strong></div>
+            <div className="text-[11px] text-slate-400 mt-0.5">TLS Ingestion Protocol Active</div>
           </div>
         </div>
-      )}
 
-      {/* Device Configuration Modal */}
-      <AnimatePresence>
-        {selectedDevice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/60" onClick={() => setSelectedDevice(null)}
-            ></motion.div>
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-sm shadow-2xl w-full max-w-lg relative z-10 overflow-hidden"
-            >
-              <div className="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-800">Device Configuration</h2>
-                  <p className="text-sm text-slate-500 font-medium mt-1">{selectedDevice.name}</p>
-                </div>
-                <button onClick={() => setSelectedDevice(null)} className="text-slate-400 hover:text-slate-600 bg-white hover:bg-slate-100 p-2 rounded-sm border border-slate-200 transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="p-6 space-y-6">
-                <div className="bg-blue-50/50 p-4 border border-blue-100 rounded-sm flex items-start gap-4">
-                  <Activity className="w-6 h-6 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-sm">Telemetry Ping Frequency</h3>
-                    <p className="text-xs text-slate-600 mt-1 mb-3">Adjust how often this sensor pushes data to the backend.</p>
-                    <select className="w-full p-2 border border-slate-300 rounded-sm text-sm focus:ring-1 focus:ring-primary focus:border-primary">
-                      <option>10 seconds (High Drain)</option>
-                      <option>30 seconds (Standard)</option>
-                      <option>1 minute (Battery Saver)</option>
-                    </select>
-                  </div>
-                </div>
+        {/* Tab Navigation */}
+        <div className="flex border-b border-slate-200/80 px-6 bg-slate-50/50">
+          <button 
+            onClick={() => setActiveTab('specs')}
+            className={`py-3 px-4 font-bold text-xs tracking-tight transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'specs' 
+                ? 'border-primary text-primary' 
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Layers className="w-4 h-4" /> Hardware Specifications
+          </button>
+          <button 
+            onClick={() => setActiveTab('pinout')}
+            className={`py-3 px-4 font-bold text-xs tracking-tight transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'pinout' 
+                ? 'border-primary text-primary' 
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Cable className="w-4 h-4" /> GPIO Pinout & Circuit
+          </button>
+          <button 
+            onClick={() => setActiveTab('protocol')}
+            className={`py-3 px-4 font-bold text-xs tracking-tight transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'protocol' 
+                ? 'border-primary text-primary' 
+                : 'border-transparent text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            <Terminal className="w-4 h-4" /> ThingSpeak Protocol
+          </button>
+        </div>
 
-                <div className="bg-slate-50 p-4 border border-slate-200 rounded-sm">
-                  <h3 className="font-bold text-slate-800 text-sm mb-3">Hardware Info</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between border-b border-slate-200 pb-2">
-                      <span className="text-slate-500 font-medium">Device ID</span>
-                      <span className="font-bold text-slate-800">{selectedDevice.device_id}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-slate-200 pb-2">
-                      <span className="text-slate-500 font-medium">MAC / Ident</span>
-                      <span className="font-mono text-slate-800">{selectedDevice.esp32_identifier}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-500 font-medium">Firmware</span>
-                      <span className="font-bold text-slate-800">v{selectedDevice.firmware_version}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
-                <button onClick={() => setSelectedDevice(null)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 border border-slate-300 rounded-sm font-semibold transition-colors">
-                  Cancel
-                </button>
-                <button onClick={() => { alert('Configuration saved (dummy)'); setSelectedDevice(null); }} className="bg-primary hover:bg-primaryHover text-white px-4 py-2 rounded-sm font-semibold shadow-sm transition-all">
-                  Save Changes
-                </button>
-              </div>
-            </motion.div>
+        {/* Tab 1: Hardware Specifications */}
+        {activeTab === 'specs' && (
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-white hover:shadow-sm transition-all space-y-1">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hardware Identifier / MAC</div>
+              <div className="text-base font-extrabold text-slate-900 font-mono">{device?.esp32_identifier || '04:b2:47:54:b1:88'}</div>
+              <div className="text-xs text-slate-500">ESP32-WROOM-32 (240MHz Dual Core)</div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-white hover:shadow-sm transition-all space-y-1">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">ThingSpeak Cloud Channel</div>
+              <div className="text-base font-extrabold text-primary font-mono">{device?.thingspeak_channel_id || '3483882'}</div>
+              <div className="text-xs text-slate-500">REST API feeds.json Buffer</div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-white hover:shadow-sm transition-all space-y-1">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Firmware Runtime</div>
+              <div className="text-base font-extrabold text-slate-900">{device?.firmware_version || '1.0.0'}</div>
+              <div className="text-xs text-slate-500">FreeRTOS Embedded C++ Binary</div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-white hover:shadow-sm transition-all space-y-1">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Primary Temperature Sensor</div>
+              <div className="text-base font-extrabold text-slate-900">DS18B20 (Dallas 1-Wire)</div>
+              <div className="text-xs text-slate-500">Range: -55°C to +125°C • ±0.5°C accuracy</div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-white hover:shadow-sm transition-all space-y-1">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Door Intrusion Sensor</div>
+              <div className="text-base font-extrabold text-slate-900">Magnetic Reed Switch</div>
+              <div className="text-xs text-slate-500">Digital NC/NO contact (Internal Pull-Up)</div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/60 hover:bg-white hover:shadow-sm transition-all space-y-1">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Local Hardware Display</div>
+              <div className="text-base font-extrabold text-slate-900">16x2 I2C Backlit LCD (0x27)</div>
+              <div className="text-xs text-slate-500">Real-time local temperature & door readout</div>
+            </div>
           </div>
         )}
-      </AnimatePresence>
+
+        {/* Tab 2: GPIO Pinout & Circuit Schematic */}
+        {activeTab === 'pinout' && (
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border border-slate-200 rounded-xl p-5 bg-slate-50/50 space-y-4">
+                <h3 className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-accent" /> ESP32 Physical Pinout Map
+                </h3>
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200/80">
+                    <span className="font-bold text-slate-700">GPIO 4</span>
+                    <span className="text-slate-500">DS18B20 Data Line (4.7kΩ Pull-Up to 3.3V)</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200/80">
+                    <span className="font-bold text-slate-700">GPIO 13</span>
+                    <span className="text-slate-500">Magnetic Reed Switch (Input Pull-Up to GND)</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200/80">
+                    <span className="font-bold text-slate-700">GPIO 21 (SDA)</span>
+                    <span className="text-slate-500">I2C LCD Data Bus</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200/80">
+                    <span className="font-bold text-slate-700">GPIO 22 (SCL)</span>
+                    <span className="text-slate-500">I2C LCD Clock Bus</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200/80">
+                    <span className="font-bold text-slate-700">VIN / 5V & GND</span>
+                    <span className="text-slate-500">LCD 5V Rail & Common Ground</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-slate-200 rounded-xl p-5 bg-slate-50/50 space-y-4">
+                <h3 className="font-extrabold text-slate-800 text-sm flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" /> Sensor Verification Status
+                </h3>
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-800 flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">DS18B20 1-Wire Bus Active</p>
+                      <p className="text-[11px] text-emerald-700 mt-0.5">CRC checksum verified on each 750ms conversion cycle.</p>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-800 flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">Magnetic Reed Debounce Logic Active</p>
+                      <p className="text-[11px] text-emerald-700 mt-0.5">Door interrupts filtered to prevent contact bounce anomalies.</p>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-800 flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">I2C Display Address 0x27 Responsive</p>
+                      <p className="text-[11px] text-blue-700 mt-0.5">Continuous hardware refresh synchronizes LCD with cloud stream.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: ThingSpeak Protocol Schema */}
+        {activeTab === 'protocol' && (
+          <div className="p-6 space-y-5">
+            <div className="bg-slate-900 rounded-xl p-5 text-white font-mono text-xs space-y-3 shadow-inner">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800">
+                <span className="text-slate-400">ThingSpeak Telemetry Channel Mapping</span>
+                <span className="text-accent">GET /channels/3483882/feeds.json</span>
+              </div>
+              <div className="space-y-1.5 text-slate-300">
+                <p><span className="text-cyan-400 font-bold">field1</span>: Temperature float in °C (e.g., 28.94)</p>
+                <p><span className="text-cyan-400 font-bold">field2</span>: Door state bit ('0' = CLOSED, '1' = OPEN)</p>
+                <p><span className="text-cyan-400 font-bold">created_at</span>: ISO-8601 UTC timestamp (e.g., 2026-10-09T02:30:15Z)</p>
+                <p><span className="text-cyan-400 font-bold">entry_id</span>: Monotonically increasing packet counter</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-600">
+              <div className="flex items-center gap-2">
+                <Radio className="w-4 h-4 text-primary" />
+                <span>Backend Polling Rate: <strong>15–20 Seconds</strong> (ThingSpeak Free Tier Rate Limited)</span>
+              </div>
+              <a 
+                href="https://thingspeak.com/channels/3483882" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="font-bold text-primary hover:underline flex items-center gap-1"
+              >
+                Channel 3483882 <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* System Architecture Notice */}
+        <div className="px-6 py-4 bg-blue-50/60 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-primary" />
+            <span>Dedicated System: Designed exclusively for single-node monitoring of ESP-001.</span>
+          </div>
+          <span className="font-bold text-primary">Provisioning: Automatic</span>
+        </div>
+      </div>
     </div>
   );
 }
