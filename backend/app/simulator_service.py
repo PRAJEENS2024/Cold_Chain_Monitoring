@@ -22,7 +22,12 @@ async def simulator_loop():
         if simulator_state.is_running and simulator_state.active_shipment_id and simulator_state.active_device_id:
             db = SessionLocal()
             try:
-                # 1. Update State based on scenario
+                # Guard against modifying physical hardware node ESP-001
+                device = db.query(models.Device).filter(models.Device.id == simulator_state.active_device_id).first()
+                if device and device.device_id == "ESP-001":
+                    # Step 9: Simulator must NEVER overwrite physical ESP-001 telemetry
+                    simulator_state.is_running = False
+                    continue
                 if simulator_state.scenario == "NORMAL":
                     # Fluctuate normally around 4.2
                     simulator_state.current_temp += random.uniform(-0.2, 0.2)

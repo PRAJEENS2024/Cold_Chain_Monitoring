@@ -1,59 +1,60 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone, timedelta
 from . import models
 
-def process_telemetry(db: Session, device: models.Device, shipment: models.Shipment, temperature: float, door_open: bool):
+def process_telemetry(db: Session, device: models.Device, shipment: Optional[models.Shipment] = None, temperature: float = 0.0, door_open: bool = False):
+    temp_min = shipment.temp_min if shipment else 2.0
+    temp_max = shipment.temp_max if shipment else 8.0
+    shipment_id = shipment.id if shipment else None
+
     # 1. Temperature Alert Logic
-    # Check if there is already an active temperature alert for this shipment
-    active_temp_alert = db.query(models.Alert).filter(
-        models.Alert.shipment_id == shipment.id,
+    query = db.query(models.Alert).filter(
+        models.Alert.device_id == device.id,
         models.Alert.status == models.AlertStatusEnum.ACTIVE,
         models.Alert.alert_type.in_([models.AlertTypeEnum.HIGH_TEMPERATURE, models.AlertTypeEnum.LOW_TEMPERATURE])
-    ).first()
+    )
+    if shipment_id:
+        query = query.filter(models.Alert.shipment_id == shipment_id)
+    active_temp_alert = query.first()
 
-    if temperature > shipment.temp_max:
+    if temperature > temp_max:
         if not active_temp_alert:
             new_alert = models.Alert(
-                shipment_id=shipment.id,
+                shipment_id=shipment_id,
                 device_id=device.id,
                 alert_type=models.AlertTypeEnum.HIGH_TEMPERATURE,
                 severity=models.AlertSeverityEnum.CRITICAL,
-                message=f"Temperature {temperature}°C exceeds safe maximum of {shipment.temp_max}°C"
+                message=f"Temperature {temperature}°C exceeds safe maximum of {temp_max}°C"
             )
             db.add(new_alert)
-    elif temperature < shipment.temp_min:
+    elif temperature < temp_min:
         if not active_temp_alert:
             new_alert = models.Alert(
-                shipment_id=shipment.id,
+                shipment_id=shipment_id,
                 device_id=device.id,
                 alert_type=models.AlertTypeEnum.LOW_TEMPERATURE,
                 severity=models.AlertSeverityEnum.CRITICAL,
-                message=f"Temperature {temperature}°C is below safe minimum of {shipment.temp_min}°C"
+                message=f"Temperature {temperature}°C is below safe minimum of {temp_min}°C"
             )
             db.add(new_alert)
-    else:
-        # If temp is back to normal, we could auto-resolve, but for now we leave it for manual resolution/acknowledgment
-        pass
 
     # 2. Door Open Alert Logic
-    # For a real system, we'd calculate duration. 
-    # Here, if door is open and an active alert doesn't exist, we can create one if it's been open 'too long'.
-    # Since we are receiving continuous telemetry, if door is open, we check the last closed event.
-    
-    active_door_alert = db.query(models.Alert).filter(
-        models.Alert.shipment_id == shipment.id,
+    door_query = db.query(models.Alert).filter(
+        models.Alert.device_id == device.id,
         models.Alert.status == models.AlertStatusEnum.ACTIVE,
         models.Alert.alert_type == models.AlertTypeEnum.DOOR_OPEN_TOO_LONG
-    ).first()
+    )
+    if shipment_id:
+        door_query = door_query.filter(models.Alert.shipment_id == shipment_id)
+    active_door_alert = door_query.first()
 
     if door_open and not active_door_alert:
-        # For prototype, we generate alert immediately on 'open' if none exists.
-        # Ideally, we would check if (now - last_door_open_event) > threshold
         new_alert = models.Alert(
-            shipment_id=shipment.id,
+            shipment_id=shipment_id,
             device_id=device.id,
             alert_type=models.AlertTypeEnum.DOOR_OPEN_TOO_LONG,
             severity=models.AlertSeverityEnum.WARNING,
-            message="Door has been opened during shipment."
+            message=f"Door is OPEN on device {device.device_id}."
         )
         db.add(new_alert)
