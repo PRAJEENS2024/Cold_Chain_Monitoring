@@ -59,6 +59,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lcdBacklight, setLcdBacklight] = useState(true);
+  const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
 
   const fetchTelemetry = async (manual = false) => {
     if (manual) setIsRefreshing(true);
@@ -68,6 +69,10 @@ export default function Dashboard() {
       });
       setTelemetry(res.data);
       setError(null);
+      if (manual) {
+        setSyncFeedback('Synchronized with ThingSpeak Channel 3483882 successfully');
+        setTimeout(() => setSyncFeedback(null), 3500);
+      }
     } catch (err: any) {
       setError('Unable to retrieve device data from backend.');
     } finally {
@@ -224,7 +229,14 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Connection & Error Banners */}
+      {/* Connection, Sync & Error Banners */}
+      {syncFeedback && (
+        <div className="bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200 p-3.5 rounded-xl flex items-center gap-2.5 font-bold text-xs shadow-sm transition-all animate-bounce-subtle">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <span>{syncFeedback}</span>
+        </div>
+      )}
+
       {error && (
         <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 p-4 rounded-xl flex items-center gap-3 font-semibold shadow-sm">
           <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
@@ -700,22 +712,22 @@ export default function Dashboard() {
       </div>
 
       {/* Hardware Pipeline Specification Footer Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-premium flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-slate-700/70">
+      <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-blue-50/90 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-800 dark:text-white p-5 rounded-2xl shadow-sm dark:shadow-premium border border-blue-200/80 dark:border-slate-700/70 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-colors duration-300">
         <div>
-          <div className="font-bold text-white text-sm flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-accent" />
+          <div className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2 font-heading">
+            <Cpu className="w-4 h-4 text-primary dark:text-accent" />
             <span>End-to-End Cold Chain Pipeline Architecture</span>
           </div>
-          <div className="text-xs text-slate-300 mt-1">
+          <div className="text-xs text-slate-600 dark:text-slate-300 mt-1">
             DS18B20 & Reed Switch → ESP32 (16x2 LCD) → ThingSpeak (Ch 3483882) → FastAPI Engine → SQLite → React Dashboard
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-300">
-          <div className="px-3 py-1 bg-white/10 rounded-lg border border-white/15">
-            LCD: <span className="text-emerald-400">16x2 I2C Active</span>
+        <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <div className="px-3 py-1 bg-white dark:bg-white/10 rounded-lg border border-blue-200/80 dark:border-white/15 shadow-2xs">
+            LCD: <span className="text-emerald-600 dark:text-emerald-400 font-bold">16x2 I2C Active</span>
           </div>
-          <div className="px-3 py-1 bg-white/10 rounded-lg border border-white/15">
-            Door State: <span className="text-accent">{telemetry?.door_open ? '1 (OPEN)' : '0 (CLOSED)'}</span>
+          <div className="px-3 py-1 bg-white dark:bg-white/10 rounded-lg border border-blue-200/80 dark:border-white/15 shadow-2xs">
+            Door State: <span className="text-primary dark:text-accent font-bold">{telemetry?.door_open ? '1 (OPEN)' : '0 (CLOSED)'}</span>
           </div>
         </div>
       </div>
