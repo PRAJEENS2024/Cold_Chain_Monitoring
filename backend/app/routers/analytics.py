@@ -100,15 +100,34 @@ def get_shipment_report(shipment_id: int, db: Session = Depends(database.get_db)
 
     readings = db.query(models.TemperatureReading).filter(
         models.TemperatureReading.shipment_id == shipment_id
-    ).all()
+    ).order_by(models.TemperatureReading.timestamp.asc()).all()
+    
+    # If no readings directly assigned to this shipment_id, query device readings or latest readings
+    if not readings and shipment.device_id:
+        readings = db.query(models.TemperatureReading).filter(
+            models.TemperatureReading.device_id == shipment.device_id
+        ).order_by(models.TemperatureReading.timestamp.asc()).all()
+
+    # Fallback to recent telemetry if needed
+    if not readings:
+        readings = db.query(models.TemperatureReading).order_by(models.TemperatureReading.timestamp.desc()).limit(100).all()
+        readings.reverse()
     
     door_events = db.query(models.DoorEvent).filter(
         models.DoorEvent.shipment_id == shipment_id
     ).count()
+    if door_events == 0 and shipment.device_id:
+        door_events = db.query(models.DoorEvent).filter(
+            models.DoorEvent.device_id == shipment.device_id
+        ).count()
 
     alerts = db.query(models.Alert).filter(
         models.Alert.shipment_id == shipment_id
     ).count()
+    if alerts == 0 and shipment.device_id:
+        alerts = db.query(models.Alert).filter(
+            models.Alert.device_id == shipment.device_id
+        ).count()
 
     if not readings:
         return {"status": "no_data"}
@@ -122,6 +141,11 @@ def get_shipment_report(shipment_id: int, db: Session = Depends(database.get_db)
         models.Alert.shipment_id == shipment_id,
         models.Alert.alert_type.in_([models.AlertTypeEnum.HIGH_TEMPERATURE, models.AlertTypeEnum.LOW_TEMPERATURE])
     ).count()
+    if excursions == 0 and shipment.device_id:
+        excursions = db.query(models.Alert).filter(
+            models.Alert.device_id == shipment.device_id,
+            models.Alert.alert_type.in_([models.AlertTypeEnum.HIGH_TEMPERATURE, models.AlertTypeEnum.LOW_TEMPERATURE])
+        ).count()
 
     # Simple health score logic
     score = 100

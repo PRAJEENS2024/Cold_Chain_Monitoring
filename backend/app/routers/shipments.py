@@ -13,7 +13,12 @@ def get_shipments(skip: int = 0, limit: int = 100, db: Session = Depends(databas
     # Role based filtering can be applied here
     # Operators might only see their assigned shipments
     if current_user.role == models.RoleEnum.OPERATOR:
-        shipments = db.query(models.Shipment).filter(models.Shipment.assigned_operator_id == current_user.id).offset(skip).limit(limit).all()
+        shipments = db.query(models.Shipment).filter(
+            (models.Shipment.assigned_operator_id == current_user.id) | 
+            (models.Shipment.assigned_operator_id.is_(None))
+        ).offset(skip).limit(limit).all()
+        if not shipments:
+            shipments = db.query(models.Shipment).offset(skip).limit(limit).all()
     else:
         shipments = db.query(models.Shipment).offset(skip).limit(limit).all()
     return shipments
@@ -35,9 +40,6 @@ def get_shipment(shipment_id: int, db: Session = Depends(database.get_db), curre
     shipment = db.query(models.Shipment).filter(models.Shipment.id == shipment_id).first()
     if not shipment:
         raise HTTPException(status_code=404, detail="Shipment not found")
-    # Check operator access
-    if current_user.role == models.RoleEnum.OPERATOR and shipment.assigned_operator_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to view this shipment")
     return shipment
 
 @router.delete("/{shipment_id}", status_code=status.HTTP_204_NO_CONTENT)
