@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: coldchain-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: THINGSPEAK_CHANNEL_ID
+        value: "3483882"
+      - key: THINGSPEAK_READ_KEY
+        value: "QOJPZL5KTMI8Z8MZ"
+      - key: DEVICE_ONLINE_TIMEOUT_SECONDS
+        value: "90"

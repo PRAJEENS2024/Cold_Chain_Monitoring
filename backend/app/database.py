@@ -3,11 +3,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Default to sqlite for local dev since docker isn't available in this environment
+# Default to sqlite for local dev, or PostgreSQL for production
 SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL", 
     "sqlite:///./coldchain.db"
 )
+
+# Compatibility fix: Render & cloud providers use postgres://, but SQLAlchemy 1.4+ requires postgresql://
+if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
