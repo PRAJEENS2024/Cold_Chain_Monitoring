@@ -65,52 +65,59 @@ async def lifespan(app: FastAPI):
             db.commit()
 
         # Startup 3: Ensure initial standard cold chain batches exist
+        
+        # Startup 3: Ensure initial standard cold chain batches exist
         if db.query(models.Shipment).count() == 0:
             batches = [
                 models.Shipment(
                     shipment_id="ESP-001-LIVE",
                     product_name="Active Chamber Monitoring (ESP-001 Live Stream)",
-                    min_temperature_threshold=2.0,
-                    max_temperature_threshold=8.0,
+                    product_category="Live Monitoring",
                     source="Physical Chamber 1-A (ESP32)",
                     destination="ThingSpeak Core Telemetry",
-                    status=models.ShipmentStatusEnum.IN_TRANSIT,
+                    temp_min=2.0,
+                    temp_max=8.0,
+                    status="IN_TRANSIT",
                     device_id=esp_device.id if esp_device else None
                 ),
                 models.Shipment(
                     shipment_id="BATCH-2026-COVAX-01",
                     product_name="WHO COVID-19 mRNA Vaccine Lot #4028",
-                    min_temperature_threshold=2.0,
-                    max_temperature_threshold=8.0,
+                    product_category="Vaccine",
                     source="Apex BioPharma Depot (Freezer 4)",
                     destination="Metropolitan General Hospital",
-                    status=models.ShipmentStatusEnum.IN_TRANSIT,
+                    temp_min=2.0,
+                    temp_max=8.0,
+                    status="IN_TRANSIT",
                     device_id=esp_device.id if esp_device else None
                 ),
                 models.Shipment(
                     shipment_id="BATCH-2026-INSULIN-44",
                     product_name="Humalog Recombinant Human Insulin (100 IU/mL)",
-                    min_temperature_threshold=2.0,
-                    max_temperature_threshold=8.0,
+                    product_category="Insulin",
                     source="Central Cold Chain Logistics Hub",
                     destination="Eastside Regional Medical Center",
-                    status=models.ShipmentStatusEnum.IN_TRANSIT,
+                    temp_min=2.0,
+                    temp_max=8.0,
+                    status="IN_TRANSIT",
                     device_id=esp_device.id if esp_device else None
                 ),
                 models.Shipment(
                     shipment_id="BATCH-2026-ONCO-89",
                     product_name="Keytruda Monoclonal Oncology Biologics",
-                    min_temperature_threshold=15.0,
-                    max_temperature_threshold=25.0,
+                    product_category="Biologics",
                     source="Biotech Cryo-Storage Facility",
                     destination="Oncology Treatment Pavilion",
-                    status=models.ShipmentStatusEnum.IN_TRANSIT,
+                    temp_min=15.0,
+                    temp_max=25.0,
+                    status="IN_TRANSIT",
                     device_id=esp_device.id if esp_device else None
                 )
             ]
             db.add_all(batches)
             db.commit()
             print("Default cold chain batches seeded successfully.", flush=True)
+
     finally:
         db.close()
         
